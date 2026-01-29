@@ -1,0 +1,363 @@
+/**
+ * global.scss - 전역 SCSS 스타일
+ * 
+ * SCSS 구조:
+ * 1. vite.config.ts의 additionalData에서 자동으로 @import
+ * 2. 글로벌 스타일 정의
+ * 
+ * 자동 로드 순서:
+ * @import "@/styles/variables.scss"  (vite 자동 추가)
+ * @import "@/styles/mixins.scss"     (vite 자동 추가)
+ * ... global.scss의 나머지 내용
+ */
+
+/* ============================================
+   글로벌 스타일
+   ============================================ */
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: #f5f7fa;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
+    "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  font-size: $font-size-base;
+  line-height: $line-height-normal;
+  color: $color-text-primary;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+#app {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* ============================================
+   2. 기본 요소 스타일
+   ============================================ */
+
+/* 제목 */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+  padding: 0;
+  font-weight: $font-weight-semibold;
+}
+
+h1 {
+  font-size: $font-size-2xl;
+}
+
+h2 {
+  font-size: $font-size-xl;
+}
+
+h3 {
+  font-size: $font-size-lg;
+}
+
+h4,
+h5,
+h6 {
+  font-size: $font-size-base;
+}
+
+/* 단락 */
+p {
+  margin: 0;
+  padding: 0;
+}
+
+/* 리스트 */
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* 링크 */
+a {
+  color: $color-primary;
+  text-decoration: none;
+  transition: color $transition-fast;
+
+  &:hover {
+    color: $color-primary-hover;
+  }
+
+  &:active {
+    color: $color-primary-active;
+  }
+}
+
+/* 버튼 */
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: inherit;
+
+  &:focus {
+    outline: 2px solid $color-primary;
+    outline-offset: 2px;
+  }
+}
+
+/* 입력 요소 */
+input,
+textarea,
+select {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: $color-text-tertiary;
+}
+
+/* ============================================
+   3. Scrollbar 스타일 (Chrome)
+   ============================================ */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: $color-bg-tertiary;
+}
+
+::-webkit-scrollbar-thumb {
+  background: $color-border;
+  border-radius: $border-radius-md;
+
+  &:hover {
+    background: $color-text-tertiary;
+  }
+}
+
+/* ============================================
+   4. 선택 텍스트 스타일
+   ============================================ */
+
+::selection {
+  background: $color-primary;
+  color: white;
+}
+
+::-moz-selection {
+  background: $color-primary;
+  color: white;
+}
+
+/* ============================================
+   5. 유틸리티 클래스
+   ============================================ */
+
+/* 숨김 */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* 컨테이너 */
+.container {
+  width: 100%;
+  max-width: $container-2xl;
+  margin: 0 auto;
+  padding: 0 $spacing-md;
+
+  @media (max-width: $breakpoint-md) {
+    padding: 0 $spacing-sm;
+  }
+}
+
+/* ============================================
+   6. Ant Design Vue 커스터마이징
+   ============================================ */
+
+/* 글로벌 테마 변수 오버라이드 */
+:root {
+  --ant-color-primary: #{$color-primary};
+  --ant-color-success: #{$color-success};
+  --ant-color-warning: #{$color-warning};
+  --ant-color-error: #{$color-error};
+  --ant-color-info: #{$color-info};
+  --ant-font-size: #{$font-size-base};
+  --ant-border-radius: #{$border-radius-md};
+}
+
+/* Ant Design Button 호버 애니메이션 */
+.ant-btn {
+  transition: all $transition-fast;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+/* Ant Design Input 포커스 상태 */
+.ant-input,
+.ant-input-number,
+.ant-picker,
+.ant-select-selector {
+  transition:
+    border-color $transition-fast,
+    box-shadow $transition-fast;
+}
+
+/* Ant Design Modal */
+.ant-modal {
+  .ant-modal-content {
+    border-radius: $border-radius-lg;
+  }
+
+  .ant-modal-header {
+    border-bottom: 1px solid $color-border;
+  }
+}
+
+/* ============================================
+   7. 애니메이션 정의
+   ============================================ */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInDown {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+/* ============================================
+   8. 반응형 유틸리티
+   ============================================ */
+
+/* 숨김 (모바일) */
+.hidden-xs {
+  @media (max-width: $breakpoint-xs) {
+    display: none;
+  }
+}
+
+/* 숨김 (태블릿) */
+.hidden-md {
+  @media (max-width: $breakpoint-md) {
+    display: none;
+  }
+}
+
+/* 숨김 (데스크톱) */
+.hidden-lg {
+  @media (min-width: $breakpoint-lg) {
+    display: none;
+  }
+}
+
+/* ============================================
+   9. 프린트 스타일
+   ============================================ */
+
+@media print {
+  body {
+    background: white;
+  }
+
+  .no-print {
+    display: none;
+  }
+}

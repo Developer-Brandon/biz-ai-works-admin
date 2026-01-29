@@ -1,0 +1,17 @@
+/**
+ * 테마 관련 스타일
+ * 
+ * Ant Design Vue 커스터마이징
+ */
+
+// Ant Design Vue 기본 색상 오버라이드
+:root {
+  --ant-color-primary: #{$primary-color};
+  --ant-color-success: #{$success-color};
+  --ant-color-warning: #{$warning-color};
+  --ant-color-error: #{$danger-color};
+  --ant-color-info: #{$info-color};
+  --ant-color-text: #{$text-primary};
+  --ant-color-border: #{$border-color};
+  --ant-color-bg-container: #{$bg-primary};
+}
