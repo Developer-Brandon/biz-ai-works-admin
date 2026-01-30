@@ -89,7 +89,7 @@ app.mount("#app");
  * 개발 환경에서 로깅
  */
 if (import.meta.env.DEV) {
-  console.log("🚀 OCI AI Admin Portal 시작됨");
+  console.log("🚀 Biz AI Admin Portal 시작됨");
   console.log("📍 라우터:", router);
   console.log("💾 Pinia:", pinia);
 }

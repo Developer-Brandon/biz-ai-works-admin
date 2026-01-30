@@ -1,176 +1,114 @@
 <template>
-  <!-- 좌측 사이드바 네비게이션 -->
-  <aside class="admin-sidebar">
-    <nav class="sidebar-menu">
-      <!-- 메뉴 아이템 -->
-      <div v-for="item in menuItems" :key="item.id" class="menu-group">
-        <!-- 그룹 타이틀 -->
-        <div class="menu-group-title">
-          {{ item.label }}
-        </div>
+  <aside class="sidebar">
+    <!-- 사이드바 헤더 -->
+    <div class="sidebar__header">
+      <h2 class="sidebar__title">Admin</h2>
+    </div>
 
-        <!-- 그룹 내 메뉴 아이템 -->
+    <!-- 메뉴 -->
+    <nav class="sidebar__nav">
+      <div class="sidebar__section">
+        <div class="sidebar__section-title">Service Custom</div>
+
+        <!-- 메뉴 아이템 -->
         <router-link
-          v-for="subItem in item.children"
-          :key="subItem.id"
-          :to="subItem.path"
-          class="menu-item"
-          :class="{ active: isActive(subItem.path) }"
-          @click="handleMenuClick(subItem.path)"
+          to="/admin/contents"
+          class="sidebar__menu-item"
+          :class="{ 'sidebar__menu-item--active': isActive('/admin/contents') }"
         >
-          <span v-if="subItem.icon" class="menu-icon">
-            <component :is="subItem.icon" />
-          </span>
-          <span class="menu-label">{{ subItem.label }}</span>
+          <FileTextOutlined class="sidebar__menu-icon" />
+          <span class="sidebar__menu-label">Contents</span>
+        </router-link>
+
+        <router-link
+          to="/admin/logo"
+          class="sidebar__menu-item"
+          :class="{ 'sidebar__menu-item--active': isActive('/admin/logo') }"
+        >
+          <FileImageOutlined class="sidebar__menu-icon" />
+          <span class="sidebar__menu-label">Logo</span>
+        </router-link>
+
+        <router-link
+          to="/admin/color-palette"
+          class="sidebar__menu-item"
+          :class="{
+            'sidebar__menu-item--active': isActive('/admin/color-palette'),
+          }"
+        >
+          <BgColorsOutlined class="sidebar__menu-icon" />
+          <span class="sidebar__menu-label">Color palette</span>
         </router-link>
       </div>
     </nav>
-
-    <!-- 사이드바 하단 (선택사항) -->
-    <div class="sidebar-footer">
-      <div class="version-info">
-        <span class="version-label">Admin v</span>
-        <span class="version-number">0.2</span>
-      </div>
-    </div>
   </aside>
 </template>
 
 <script setup lang="ts">
 /**
- * 어드민 페이지 좌측 사이드바 컴포넌트
+ * Sidebar.vue - 어드민 사이드바 네비게이션
  *
  * 기능:
- * - 네비게이션 메뉴 표시
- * - 현재 활성 페이지 강조
- * - 메뉴 아이콘 표시
- * - 부드러운 호버 애니메이션
+ * - Contents, Logo, Color Palette 메뉴
+ * - 현재 활성 메뉴 표시
+ * - 반응형 (모바일에서 숨김)
  *
- * Props:
- * - currentPath: 현재 활성 경로
+ * Props: 없음
+ * Emits: 없음
  *
- * Emits:
- * - navigate: 메뉴 클릭 시
+ * 사용 위치:
+ * - Layout.vue의 좌측에서 사용
+ *
+ * Vue3 Composition API:
+ * - useRoute() 훅으로 현재 라우트 정보 접근
  */
 
-import { ref, computed } from "vue";
+import { computed } from "vue";
 import { useRoute } from "vue-router";
 import {
   FileTextOutlined,
-  PictureOutlined,
+  FileImageOutlined,
   BgColorsOutlined,
-  AuditOutlined,
 } from "@ant-design/icons-vue";
-import type { SidebarMenu } from "@/types";
 
-/**
- * Props 정의
- */
-interface Props {
-  currentPath?: string;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  currentPath: "",
-});
-
+// 현재 라우트
 const route = useRoute();
 
 /**
- * 메뉴 아이템 구조
+ * 메뉴 아이템이 활성 상태인지 확인
  *
- * 기획서 참고:
- * - Service Custom
- *   ├── Contents
- *   ├── Logo
- *   └── Color palette
- */
-const menuItems = ref<Array<SidebarMenu & { children: SidebarMenu[] }>>([
-  {
-    id: "service-custom",
-    label: "Service Custom",
-    icon: undefined,
-    path: "",
-    children: [
-      {
-        id: "contents",
-        label: "Contents",
-        icon: FileTextOutlined,
-        path: "/admin/contents",
-      },
-      {
-        id: "logo",
-        label: "Logo",
-        icon: PictureOutlined,
-        path: "/admin/logo",
-      },
-      {
-        id: "color-palette",
-        label: "Color palette",
-        icon: BgColorsOutlined,
-        path: "/admin/color-palette",
-      },
-    ],
-  },
-  {
-    id: "audit",
-    label: "Audit (국정감사)",
-    icon: undefined,
-    path: "",
-    children: [
-      {
-        id: "audit-management",
-        label: "Audit Management",
-        icon: AuditOutlined,
-        path: "/admin/audit",
-      },
-    ],
-  },
-]);
-
-/**
- * 경로 활성 여부 확인
+ * Vue3에서:
+ * - route.path: 현재 경로 문자열 (예: '/admin/contents')
+ * - startsWith(): 경로 확인
  *
- * @param path - 확인할 경로
- * @returns 현재 경로와 일치하는지 여부
+ * Vue2 vs Vue3:
+ * - Vue2: this.$route.path (this 필수)
+ * - Vue3: route.path (변수 직접 접근)
  */
-function isActive(path: string): boolean {
-  return route.path === path || props.currentPath === path;
-}
-
-/**
- * 메뉴 클릭 핸들러
- *
- * @param path - 이동할 경로
- */
-function handleMenuClick(path: string): void {
-  // 라우터가 자동으로 처리하므로 추가 로직 불필요
-  // 필요하면 emit으로 부모 컴포넌트에 알림
-}
+const isActive = (path: string): boolean => {
+  return route.path.startsWith(path);
+};
 </script>
 
 <style scoped lang="scss">
 /**
- * 사이드바 스타일
- * 
- * 애니메이션:
- * - 메뉴 아이템 hover 시 좌측 테두리 색상 변경
- * - 활성 메뉴 배경색 부드러운 전환
- * - 아이콘 회전 애니메이션
+ * Sidebar 스타일
  */
 
-.admin-sidebar {
-  width: 256px;
-  height: 100vh;
-  background-color: #fafafa;
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 64px;
+  width: 220px;
+  height: calc(100vh - 64px);
+  padding: 16px 0;
+  background: #fafafa;
   border-right: 1px solid #f0f0f0;
-  display: flex;
-  flex-direction: column;
   overflow-y: auto;
-  overflow-x: hidden;
-  transition: background-color 0.3s ease;
+  z-index: 50;
+  transition: all 0.3s ease-in-out;
 
-  // 스크롤바 스타일
+  /* 스크롤바 스타일 */
   &::-webkit-scrollbar {
     width: 6px;
   }
@@ -189,189 +127,104 @@ function handleMenuClick(path: string): void {
   }
 }
 
-.sidebar-menu {
-  flex: 1;
+/* 사이드바 헤더 */
+.sidebar__header {
+  padding: 12px 24px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.sidebar__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #262626;
+}
+
+/* 네비게이션 */
+.sidebar__nav {
   padding: 16px 0;
-  overflow-y: auto;
 }
 
-/**
- * 메뉴 그룹
- */
-.menu-group {
-  margin-bottom: 20px;
-
-  &:first-child {
-    margin-top: 8px;
-  }
-
-  .menu-group-title {
-    padding: 8px 16px;
-    font-size: 12px;
-    font-weight: 600;
-    color: #8c8c8c;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    transition: color 0.3s ease;
-
-    // Vue3에서는 ::v-deep 또는 :deep() 사용 가능
-    // Vue2에서는 /deep/ 또는 >>> 사용
-  }
+/* 메뉴 섹션 */
+.sidebar__section {
+  margin-bottom: 16px;
 }
 
-/**
- * 메뉴 아이템
- */
-.menu-item {
+.sidebar__section-title {
+  padding: 0 24px;
+  margin-bottom: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #8c8c8c;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* 메뉴 아이템 */
+.sidebar__menu-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px 16px;
-  margin: 4px 8px;
-  border-radius: 6px;
-  color: #595959;
+  gap: 8px;
+  padding: 8px 24px;
+  margin: 0 12px;
+  color: #8c8c8c;
   text-decoration: none;
+  border-radius: 4px;
+  transition: all 0.2s ease-in-out;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border-left: 3px solid transparent;
-  position: relative;
 
-  /**
-   * Vue Router <router-link>의 활성 상태
-   * 
-   * .active 클래스는 명시적으로 추가하거나,
-   * router-link-active / router-link-exact-active를 사용할 수 있음
-   */
+  /* Hover 상태 */
   &:hover {
-    background-color: #f5f5f5;
-    color: #2563eb;
-    border-left-color: #2563eb;
-    padding-left: 20px;
-
-    .menu-icon {
-      transform: translateX(4px);
-    }
+    background: #ffffff;
+    color: #1890ff;
   }
 
-  &.active {
-    background: linear-gradient(135deg, #e6f4ff 0%, #f0f8ff 100%);
-    color: #2563eb;
-    border-left-color: #2563eb;
-    font-weight: 500;
-    box-shadow: inset 0 2px 8px rgba(37, 99, 235, 0.08);
+  /* 활성 상태 */
+  &.sidebar__menu-item--active {
+    background: #1890ff;
+    color: white;
+    font-weight: 600;
 
-    .menu-icon {
-      color: #2563eb;
-    }
-
-    // 활성 메뉴 우측 인디케이터
-    &::after {
-      content: "";
-      position: absolute;
-      right: 8px;
-      width: 4px;
-      height: 4px;
-      background-color: #2563eb;
-      border-radius: 50%;
-      animation: activePulse 1.5s ease-in-out infinite;
-    }
-  }
-
-  .menu-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    transition: all 0.3s ease;
-    flex-shrink: 0;
-  }
-
-  .menu-label {
-    font-size: 14px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-}
-
-/**
- * 활성 메뉴 인디케이터 애니메이션
- */
-@keyframes activePulse {
-  0%,
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.6;
-    transform: scale(1.3);
-  }
-}
-
-/**
- * 사이드바 하단 (버전 정보)
- */
-.sidebar-footer {
-  padding: 16px;
-  border-top: 1px solid #f0f0f0;
-  margin-top: auto;
-
-  .version-info {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    justify-content: center;
-
-    .version-label {
-      font-size: 12px;
-      color: #8c8c8c;
-    }
-
-    .version-number {
-      font-size: 12px;
-      font-weight: 600;
-      color: #2563eb;
+    .sidebar__menu-icon {
+      color: white;
     }
   }
 }
 
-/**
- * 반응형 디자인 (나중에 모바일 대응)
- */
+/* 메뉴 아이콘 */
+.sidebar__menu-icon {
+  width: 18px;
+  height: 18px;
+  color: inherit;
+  transition: color 0.2s ease-in-out;
+}
+
+/* 메뉴 라벨 */
+.sidebar__menu-label {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* 반응형 설정 */
 @media (max-width: 1024px) {
-  .admin-sidebar {
+  .sidebar {
     width: 200px;
   }
 
-  .menu-item {
-    padding: 8px 12px;
+  .sidebar__menu-item {
+    padding: 8px 16px;
+    margin: 0 8px;
+  }
 
-    &:hover {
-      padding-left: 16px;
-    }
-
-    .menu-label {
-      font-size: 13px;
-    }
+  .sidebar__section-title {
+    padding: 0 16px;
   }
 }
 
 @media (max-width: 768px) {
-  .admin-sidebar {
-    position: fixed;
-    left: 0;
-    top: 0;
-    z-index: 998;
-    width: 200px;
-    height: 100vh;
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
-
-    // 모바일에서 열린 상태 (별도 JS 로직으로 제어)
-    &.open {
-      transform: translateX(0);
-    }
+  .sidebar {
+    display: none;
   }
 }
 </style>

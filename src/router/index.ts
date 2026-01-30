@@ -125,7 +125,7 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const title = to.meta.title as string | undefined;
   if (title) {
-    document.title = `${title} - OCI AI Admin`;
+    document.title = `${title} - Biz AI Admin`;
   }
 
   next();
