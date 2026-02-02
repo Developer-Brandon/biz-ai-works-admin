@@ -93,7 +93,7 @@ const handleMenuClick = (e: any) => {
   align-items: center;
   justify-content: space-between;
   padding: 12px 24px;
-  max-width: 1400px;
+  max-width: 1600px;
   margin: 0 auto;
 }
 
@@ -101,10 +101,10 @@ const handleMenuClick = (e: any) => {
 .header__logo {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 3px;
   font-size: 16px;
   font-weight: 600;
-  color: #1890ff;
+  color: $color-text-primary;
   text-decoration: none;
   cursor: pointer;
   transition: opacity 0.2s ease-in-out;
