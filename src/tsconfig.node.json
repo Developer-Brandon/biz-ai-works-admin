@@ -3,9 +3,6 @@
     /* ✅ composite: true 필수 */
     "composite": true,
 
-    /* ✅ noEmit: true 필수 */
-    "noEmit": true,
-
     "skipLibCheck": true,
     "module": "ESNext",
 
