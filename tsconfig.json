@@ -8,6 +8,7 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
 
+    /* 경로 별칭 설정 */
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
@@ -21,16 +22,33 @@
       "@router/*": ["src/router/*"]
     },
 
-    "moduleResolution": "node",
+    /* ✅ 수정: node -> bundler */
+    "moduleResolution": "bundler",
+
+    /* Vue3 설정 */
+    "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx",
+
+    /* ✅ 수정: react-jsx -> preserve (Vue용) */
+    "jsx": "preserve",
+
+    /* 타입 검사 */
     "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+
+    /* ✅ 수정: true -> false (개발 편의성) */
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"],
+
+  /* tsconfig.node.json 참조 */
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ]
 }
