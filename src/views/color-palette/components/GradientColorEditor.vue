@@ -22,7 +22,10 @@
         <a-input
           :value="startColor"
           placeholder="#000000"
-          @change="(e) => emit('update-start', e.target.value)"
+          @change="
+            (e: Event) =>
+              emit('update-start', (e.target as HTMLInputElement).value)
+          "
           class="hex-input"
         />
       </div>
@@ -42,7 +45,10 @@
         <a-input
           :value="endColor"
           placeholder="#ffffff"
-          @change="(e) => emit('update-end', e.target.value)"
+          @change="
+            (e: Event) =>
+              emit('update-end', (e.target as HTMLInputElement).value)
+          "
           class="hex-input"
         />
       </div>

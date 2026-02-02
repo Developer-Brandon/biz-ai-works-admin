@@ -20,7 +20,10 @@
         <a-input
           :value="color"
           placeholder="#000000"
-          @change="(e) => emit('update-color', e.target.value)"
+          @change="
+            (e: Event) =>
+              emit('update-color', (e.target as HTMLInputElement).value)
+          "
           class="hex-input"
         />
 
@@ -52,7 +55,10 @@
         <a-input
           :value="hoverColor"
           placeholder="#000000"
-          @change="(e) => emit('update-hover-color', e.target.value)"
+          @change="
+            (e: Event) =>
+              emit('update-hover-color', (e.target as HTMLInputElement).value)
+          "
           class="hex-input"
         />
       </div>

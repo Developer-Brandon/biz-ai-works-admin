@@ -11,7 +11,10 @@
       <label class="form-label">Card Type</label>
       <a-radio-group
         :value="card.cardType"
-        @change="(e) => updateCard('cardType', e.target.value)"
+        @change="
+          (e: Event) =>
+            updateCard('cardType', (e.target as HTMLInputElement).value)
+        "
         class="radio-group"
       >
         <a-radio value="chatCard">Agent Card</a-radio>
@@ -48,7 +51,10 @@
         <a-input
           :value="card.name"
           placeholder="Enter agent name"
-          @change="(e) => updateCard('name', e.target.value)"
+          @change="
+            (e: Event) =>
+              updateCard('name', (e.target as HTMLInputElement).value)
+          "
           :maxlength="50"
           class="form-control"
         />
@@ -63,7 +69,10 @@
           placeholder="Enter agent description (0/50)"
           :rows="4"
           :maxlength="50"
-          @change="(e) => updateCard('description', e.target.value)"
+          @change="
+            (e: Event) =>
+              updateCard('description', (e.target as HTMLTextAreaElement).value)
+          "
           class="form-control"
         />
         <span class="char-count">
@@ -138,7 +147,13 @@
           >
             <a-checkbox
               :checked="isQuestionSelected(question)"
-              @change="(e) => toggleQuestion(question, e.target.checked)"
+              @change="
+                (e: Event) =>
+                  toggleQuestion(
+                    question,
+                    (e.target as HTMLInputElement).checked,
+                  )
+              "
             />
             <span class="question-label">{{ question }}</span>
           </div>
@@ -154,7 +169,10 @@
         <a-input
           :value="card.name"
           placeholder="Enter service name"
-          @change="(e) => updateCard('name', e.target.value)"
+          @change="
+            (e: Event) =>
+              updateCard('name', (e.target as HTMLInputElement).value)
+          "
           class="form-control"
         />
       </div>
@@ -166,7 +184,10 @@
           :value="card.description"
           placeholder="Enter service description"
           :rows="4"
-          @change="(e) => updateCard('description', e.target.value)"
+          @change="
+            (e: Event) =>
+              updateCard('description', (e.target as HTMLTextAreaElement).value)
+          "
           class="form-control"
         />
       </div>

@@ -3,12 +3,21 @@
  *
  * 사용자 인증 정보와 토큰 관리
  * localStorage 자동 저장 (pinia-plugin-persistedstate)
+ *
+ * Vue3 + TypeScript 특징:
+ * - Composition API로 작성
+ * - ref<T>로 반응형 상태 관리
+ * - computed로 계산된 속성
+ * - pinia-plugin-persistedstate로 localStorage 동기화
  */
 
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 import type { AuthResponse } from "@/types";
 
+/**
+ * 인증 상태 인터페이스
+ */
 interface AuthState {
   accessToken: string | null;
   refreshToken: string | null;
@@ -27,6 +36,10 @@ export const useAuthStore = defineStore(
      *
      * API 요청 시 Authorization 헤더에 포함됨
      * 만료 시간: 보통 1시간
+     *
+     * Vue2 vs Vue3:
+     * - Vue2: this.accessToken = null
+     * - Vue3: const accessToken = ref<string | null>(null)
      */
     const accessToken = ref<string | null>(null);
 
@@ -62,6 +75,10 @@ export const useAuthStore = defineStore(
      * 로그인 여부
      *
      * Access Token이 있으면 로그인 상태
+     *
+     * Vue2 vs Vue3:
+     * - Vue2: computed: { isLoggedIn() { return !!this.accessToken } }
+     * - Vue3: const isLoggedIn = computed(() => !!accessToken.value)
      */
     const isLoggedIn = computed(() => !!accessToken.value);
 
@@ -219,16 +236,20 @@ export const useAuthStore = defineStore(
     };
   },
   {
-    persist: {
-      enabled: true,
-      strategies: [
-        {
-          key: "auth",
-          storage: localStorage,
-          paths: ["accessToken", "refreshToken", "email", "isInitialPassword"],
-        },
-      ],
-    },
+    // ✅ 수정: persist 옵션을 배열 형식으로 변경
+    persist: [
+      {
+        key: "auth-store",
+        storage: localStorage,
+        paths: [
+          "accessToken",
+          "refreshToken",
+          "email",
+          "isInitialPassword",
+          "savedEmail",
+        ],
+      },
+    ],
   },
 );
 

@@ -92,6 +92,7 @@
         v-for="logo in logos"
         :key="logo.id"
         :logo="logo"
+        mode="view"
         :is-selected="logo.isSelected"
         class="logo-item"
       />
