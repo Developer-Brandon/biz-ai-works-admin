@@ -359,3 +359,11 @@ textarea::placeholder {
     display: none;
   }
 }
+
+/* ============================================
+   10. 드래그 방지
+   ============================================ */
+.no-drag {
+  cursor: default;
+  user-select: none;
+}

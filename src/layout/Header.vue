@@ -3,7 +3,7 @@
     <!-- 헤더 컨테이너 -->
     <div class="header__container">
       <!-- 좌측: 로고 -->
-      <div class="header__logo" @click="$router.push('/admin')">
+      <div class="header__logo">
         <img
           src="@/assets/logo.png"
           alt="Biz AI Works"
@@ -46,24 +46,6 @@
 </template>
 
 <script setup lang="ts">
-/**
- * Header.vue - 어드민 헤더 컴포넌트
- *
- * 기능:
- * - 로고 표시
- * - 사용자 메뉴 (프로필, 로그아웃 등)
- *
- * Props: 없음
- * Emits: 없음
- *
- * 사용 위치:
- * - Layout.vue의 최상단에서 사용
- *
- * Vue3 vs Vue2:
- * - Vue2: export default { methods: { ... } }
- * - Vue3: <script setup>에서 함수 직접 정의
- */
-
 import { useRouter } from "vue-router";
 import {
   UserOutlined,
@@ -71,13 +53,9 @@ import {
   LogoutOutlined,
 } from "@ant-design/icons-vue";
 
-// 라우터 인스턴스
 const router = useRouter();
-
 /**
  * 사용자 메뉴 클릭 핸들러
- *
- * @param e - Ant Design의 Menu 이벤트 객체
  */
 const handleMenuClick = (e: any) => {
   const key = e.key;
@@ -101,13 +79,6 @@ const handleMenuClick = (e: any) => {
 </script>
 
 <style scoped lang="scss">
-/**
- * Header 스타일
- * 
- * SCSS 변수 및 믹스인은 vite.config.ts의 additionalData로 자동 주입됨
- * 따라서 @import 없이 바로 사용 가능
- */
-
 .header {
   position: sticky;
   top: 0;
@@ -115,40 +86,42 @@ const handleMenuClick = (e: any) => {
   background: #ffffff;
   border-bottom: 1px solid #f0f0f0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  &__container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 24px;
-    max-width: 1400px;
-    margin: 0 auto;
-  }
-  &__logo {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 16px;
-    font-weight: 600;
-    color: $color-text-primary;
-    text-decoration: none;
-    cursor: pointer;
-    transition: opacity 0.2s ease-in-out;
+}
 
-    &:hover {
-      opacity: 0.8;
-    }
-  }
+.header__container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 /* 좌측: 로고 */
-.header .header__logo-image {
-  width: 40px;
-  height: 40px;
+.header__logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1890ff;
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity 0.2s ease-in-out;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.header__logo-image {
+  width: 32px;
+  height: 32px;
   object-fit: contain;
 }
 
 .header__logo-text {
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 600;
 }
 
@@ -202,6 +175,17 @@ const handleMenuClick = (e: any) => {
   height: 18px;
 }
 
+/* ✅ Breadcrumb 래퍼 */
+.header__breadcrumb-wrapper {
+  padding: 0 24px;
+  background: #fafafa;
+  border-top: 1px solid #f0f0f0;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+  transition: all 0.3s ease;
+}
+
 /* 반응형 */
 @media (max-width: 768px) {
   .header__container {
@@ -214,6 +198,10 @@ const handleMenuClick = (e: any) => {
 
   .header__user-name {
     display: none;
+  }
+
+  .header__breadcrumb-wrapper {
+    padding: 0 16px;
   }
 }
 </style>

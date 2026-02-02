@@ -16,6 +16,31 @@
 // ============================================
 
 /**
+ * 모든 TypeScript 타입 정의를 한곳에서 관리합니다
+ */
+
+/**
+ * Breadcrumb 항목 타입
+ *
+ * @property label - 표시할 텍스트
+ * @property path - 이동할 경로 (빈 문자열일 수 있음)
+ * @property active - 현재 활성화 여부
+ *
+ * Vue2에서는 이런 타입이 없었지만,
+ * Vue3 + TypeScript에서는 타입 안정성을 위해 필수입니다
+ *
+ * 사용 예시:
+ * const breadcrumbItems: BreadcrumbItem[] = [
+ *   { label: "Admin", path: "/admin", active: false },
+ *   { label: "Contents", path: "/admin/contents", active: true },
+ * ];
+ */
+export interface BreadcrumbItem {
+  label: string;
+  path: string;
+  active: boolean;
+}
+/**
  * API 응답 기본 구조
  *
  * 모든 API 응답은 이 형식을 따릅니다:

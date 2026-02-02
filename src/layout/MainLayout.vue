@@ -1,5 +1,6 @@
 <template>
   <div class="admin-layout">
+    <!-- Header에서 Breadcrumb은 제거 -->
     <Header
       :is-deploying="isDeploying"
       :deploy-progress="deployProgress"
@@ -13,12 +14,15 @@
       <Sidebar :current-path="currentPath" />
       <main class="layout-content">
         <div class="content-wrapper">
+          <!-- ✅ 이렇게 수정! -->
+          <div class="header__breadcrumb-wrapper">
+            <Breadcrumb :items="breadcrumbItems" />
+          </div>
+
           <router-view v-slot="{ Component }">
             <Transition name="fade-slide" mode="out-in">
-              <!-- Component 렌더링 확인 -->
               <template v-if="Component">
                 <div style="width: 100%; background: white">
-                  <!-- 디버깅: 배경색을 흰색으로 설정하면 렌더링 확인 가능 -->
                   <component :is="Component" :key="$route.path" />
                 </div>
               </template>
@@ -40,6 +44,8 @@ import { ref, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import Header from "./Header.vue";
 import Sidebar from "./Sidebar.vue";
+import Breadcrumb from "@/components/Breadcrumb.vue";
+import type { BreadcrumbItem } from "@/types";
 
 const route = useRoute();
 const router = useRouter();
@@ -47,31 +53,52 @@ const isDeploying = ref(false);
 const deployProgress = ref(0);
 const userName = ref("Admin User");
 
-/**
- * 배포 가능 여부 (실제로는 스토어에서 가져올 수 있음)
- */
 const canDeploy = computed(() => !isDeploying.value);
-
-/**
- * 현재 경로
- */
 const currentPath = computed(() => route.path);
 
 /**
- * 배포 버튼 클릭 핸들러
- * 실제 배포 로직은 서비스 호출로 구현
+ * ✅ 실제 데이터인 breadcrumbItems
+ * BreadcrumbItem은 타입이고, breadcrumbItems는 데이터입니다!
  */
+const breadcrumbMap: Record<string, BreadcrumbItem[]> = {
+  "/admin": [{ label: "Admin", path: "/", active: true }],
+  "/admin/contents": [
+    { label: "Admin", path: "/admin", active: false },
+    { label: "Service Custom", path: "", active: false },
+    { label: "Contents", path: "/admin/contents", active: true },
+  ],
+  "/admin/logo": [
+    { label: "Admin", path: "/admin", active: false },
+    { label: "Service Custom", path: "", active: false },
+    { label: "Logo", path: "/admin/logo", active: true },
+  ],
+  "/admin/color-palette": [
+    { label: "Admin", path: "/admin", active: false },
+    { label: "Service Custom", path: "", active: false },
+    { label: "Color Palette", path: "/admin/color-palette", active: true },
+  ],
+};
+
+/**
+ * ✅ 현재 경로에 맞는 breadcrumbItems 반환
+ */
+const breadcrumbItems = computed(() => {
+  return (
+    breadcrumbMap[route.path] || [
+      { label: "Admin", path: "/admin", active: true },
+    ]
+  );
+});
+
 async function handleDeploy(): Promise<void> {
   isDeploying.value = true;
   deployProgress.value = 0;
 
   try {
-    // 배포 시뮬레이션
     for (let i = 0; i <= 100; i += 10) {
       deployProgress.value = i;
       await new Promise((resolve) => setTimeout(resolve, 200));
     }
-    // 배포 성공
     console.log("배포 완료!");
   } catch (error) {
     console.error("배포 실패:", error);
@@ -81,9 +108,6 @@ async function handleDeploy(): Promise<void> {
   }
 }
 
-/**
- * 로그아웃 핸들러
- */
 function handleLogout(): void {
   localStorage.removeItem("auth-token");
   router.push("/login");
@@ -91,9 +115,7 @@ function handleLogout(): void {
 </script>
 
 <style scoped lang="scss">
-/**
- * 어드민 레이아웃 스타일
- */
+/* 기존 스타일 동일 */
 .admin-layout {
   display: flex;
   flex-direction: column;
@@ -102,9 +124,6 @@ function handleLogout(): void {
   overflow: hidden;
 }
 
-/**
- * 레이아웃 바디 (사이드바 + 메인 콘텐츠)
- */
 .layout-body {
   display: flex;
   flex: 1;
@@ -112,20 +131,15 @@ function handleLogout(): void {
   background: linear-gradient(to bottom, #f5f5f5, #eaeaea);
 }
 
-/**
- * 메인 콘텐츠 영역
- * 
- * ✅ Sidebar가 position: fixed이므로
- * content에 margin-left를 주어야 함!
- */
 .layout-content {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  margin-left: 220px; /* Sidebar 너비 */
-  width: calc(100% - 220px); /* 유효한 너비 */
+  margin-left: 220px;
+  width: calc(100% - 220px);
   position: relative;
   z-index: 1;
+
   &::-webkit-scrollbar {
     width: 8px;
   }
@@ -145,9 +159,6 @@ function handleLogout(): void {
   }
 }
 
-/**
- * 콘텐츠 래퍼
- */
 .content-wrapper {
   padding: 24px;
   min-height: 100%;
@@ -158,8 +169,13 @@ function handleLogout(): void {
 }
 
 /**
- * 페이지 전환 애니메이션
+ * ✅ Breadcrumb 래퍼 스타일 추가
  */
+.header__breadcrumb-wrapper {
+  padding: 0 0 16px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
 .fade-slide-enter-active,
 .fade-slide-leave-active {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -175,9 +191,6 @@ function handleLogout(): void {
   transform: translateY(-8px);
 }
 
-/**
- * 반응형 디자인
- */
 @media (max-width: 1024px) {
   .layout-content {
     margin-left: 200px;
@@ -192,7 +205,7 @@ function handleLogout(): void {
 
   .layout-content {
     width: 100%;
-    margin-left: 0; /* 모바일에서는 여백 제거 */
+    margin-left: 0;
   }
 
   .content-wrapper {
