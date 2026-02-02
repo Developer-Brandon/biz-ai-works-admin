@@ -26,28 +26,21 @@ import type {
 
 /**
  * 카드 목록 조회
- *
- * @param office - 회사 코드 (예: "ktds")
- * @returns Promise<카드 배열>
- *
- * 사용 예시:
- * ```typescript
- * const cards = await contentService.getCardList('ktds')
- * ```
  */
 export async function getCardList(office: string): Promise<Card[]> {
   try {
-    const response = await request.post<ApiResponse<Card[]>>(
-      "/api/app/info/card/list",
-      { office },
-    );
-    return response.data || [];
+    // 백엔드 응답 구조에 맞춰서 수정
+    const response = await request.post<Card[]>("/api/app/info/card/list", {
+      office,
+    });
+
+    // response가 이미 Card[] 또는 { data: Card[] } 형태일 수 있으니 확인
+    return Array.isArray(response) ? response : response?.data || [];
   } catch (error) {
     console.error("카드 목록 조회 실패:", error);
     throw error;
   }
 }
-
 /**
  * 카드 추가 (Agent Card 또는 Q&A Card)
  *

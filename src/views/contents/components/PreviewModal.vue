@@ -18,7 +18,7 @@
           <div class="logo-area">
             <div class="logo-placeholder">Logo</div>
           </div>
-          <h1 class="preview-title">Biz AI Works</h1>
+          <h1 class="preview-title">Biz.AI</h1>
         </div>
 
         <!-- 카드 섹션 -->

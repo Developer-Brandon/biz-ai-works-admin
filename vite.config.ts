@@ -211,7 +211,7 @@ export default defineConfig({
          * - 변수/mixin을 즉시 사용 가능
          * - global.scss의 @import와 충돌 없음
          */
-        additionalData: `@import "@/styles/variables.scss"; @import "@/styles/mixins.scss";`,
+        additionalData: `@use "@/styles/variables" as *; @use "@/styles/mixins" as *;`,
       },
     },
   },

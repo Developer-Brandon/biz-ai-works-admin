@@ -4,7 +4,12 @@
 
 import type { ApiResponse } from "@/types";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+// 개발/프로덕션 환경에 따라 API_BASE_URL 설정
+const isDevelopment = import.meta.env.DEV;
+const API_BASE_URL = isDevelopment
+  ? "" // 개발: 상대 경로 (proxy 사용)
+  : import.meta.env.VITE_API_BASE_URL; // 프로덕션: 절대 경로
+
 const API_TIMEOUT = parseInt(import.meta.env.VITE_API_TIMEOUT) || 30000;
 
 async function fetchWithTimeout(
@@ -25,7 +30,13 @@ async function fetchWithTimeout(
   const timeoutId = setTimeout(() => controller.abort(), timeout);
 
   try {
-    const response = await fetch(`${API_BASE_URL}${url}`, {
+    // 개발 환경: 상대 경로로 요청 (proxy가 처리)
+    // 프로덕션: 절대 경로로 요청
+    const fullUrl = isDevelopment ? url : `${API_BASE_URL}${url}`;
+
+    console.log(`[API] ${fetchOptions.method || "GET"} ${fullUrl}`);
+
+    const response = await fetch(fullUrl, {
       ...fetchOptions,
       headers,
       signal: controller.signal,
@@ -56,7 +67,7 @@ export async function get<T = any>(
   });
 
   if (!response.ok) {
-    throw new Error("요청 실패");
+    throw new Error(`HTTP ${response.status}: 요청 실패`);
   }
 
   const data = (await response.json()) as ApiResponse<T>;
@@ -75,7 +86,7 @@ export async function post<T = any>(
   });
 
   if (!response.ok) {
-    throw new Error("요청 실패");
+    throw new Error(`HTTP ${response.status}: 요청 실패`);
   }
 
   const data = (await response.json()) as ApiResponse<T>;
@@ -98,7 +109,9 @@ export async function postFormData<T = any>(
   const timeoutId = setTimeout(() => controller.abort(), timeout);
 
   try {
-    const response = await fetch(`${API_BASE_URL}${url}`, {
+    const fullUrl = isDevelopment ? url : `${API_BASE_URL}${url}`;
+
+    const response = await fetch(fullUrl, {
       ...options,
       method: "POST",
       headers,
@@ -109,7 +122,7 @@ export async function postFormData<T = any>(
     clearTimeout(timeoutId);
 
     if (!response.ok) {
-      throw new Error("요청 실패");
+      throw new Error(`HTTP ${response.status}: 요청 실패`);
     }
 
     const data = (await response.json()) as ApiResponse<T>;

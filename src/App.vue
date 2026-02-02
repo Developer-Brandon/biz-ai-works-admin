@@ -1,100 +1,104 @@
 <template>
-  <!-- 
-    App.vue - 최상위 컴포넌트
-    
-    구조:
-    - <a-config-provider>: Ant Design Vue 전역 설정
-      - getPopupContainer: 모달, 드롭다운, 팝오버 등의 팝업 렌더링 위치 설정
-    - <router-view>: 현재 라우트에 해당하는 컴포넌트 렌더링
-    
-    라우팅 흐름:
-    /admin/contents → Contents.vue
-    /admin/logo → Logo.vue
-    /admin/color-palette → ColorPalette.vue
-    
-    Layout.vue는 /admin 경로의 children에 포함되므로,
-    Layout.vue 내부의 <router-view>에 위 컴포넌트들이 렌더링됩니다.
-    
-    Vue3 vs Vue2:
-    - Vue2: <v-app> 또는 루트 요소로 감싸기
-    - Vue3: <a-config-provider>로 감싸기 (Ant Design Vue 권장)
-  -->
-  <a-config-provider :get-popup-container="getPopupContainer">
-    <router-view />
-  </a-config-provider>
+  <component :is="currentLayout" />
 </template>
 
 <script setup lang="ts">
-/**
- * App.vue - 최상위 애플리케이션 컴포넌트
- *
- * Ant Design Vue ConfigProvider 설정:
- * - getPopupContainer: 팝업 컨테이너 위치 지정
- *
- * Vue3 특징:
- * - <script setup lang="ts">: 최신 문법
- * - 자동으로 최상위 스코프로 export
- *
- * Vue2 vs Vue3:
- * - Vue2: export default { name: 'App', ... }
- * - Vue3: <script setup>은 name, props 등을 명시적으로 선언
- */
+import { onBeforeMount, computed, onMounted, ref, nextTick } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { useAuthStore } from "@/stores/useAuthStore";
+import { useTestAuthStore } from "@/stores/useTestAuthStore";
+import { autoLogin } from "@/services/autoLoginService";
+import MainLayout from "@/layout/MainLayout.vue";
 
-import { useRouter } from "vue-router";
-
-/**
- * 라우터 인스턴스 (라우트 정보 접근용)
- */
+const route = useRoute();
 const router = useRouter();
+const authStore = useAuthStore();
+const testAuthStore = useTestAuthStore();
+const isLoading = ref(false);
 
 /**
- * Ant Design Vue 팝업 컨테이너 설정
- *
- * 기능:
- * - Modal, Dropdown, Tooltip 등의 팝업을 어느 요소 내에서 렌더링할지 지정
- * - 일반적으로 #app 요소로 설정
- * - 스크롤 및 위치 계산이 올바르게 동작하도록 함
- *
- * Vue3에서 ConfigProvider 사용 방법:
- * <a-config-provider :get-popup-container="getPopupContainer">
- *   <component-with-modals />
- * </a-config-provider>
+ * Layout 컴포넌트 매핑
  */
-const getPopupContainer = (): HTMLElement => {
-  // document.body에 팝업 렌더링 (모든 모달/드롭다운이 body 직하위에 렌더됨)
-  return document.body;
+const layoutComponents = {
+  MainLayout,
 };
 
 /**
- * 개발 환경에서만 라우트 정보 로깅
+ * 현재 렌더링할 Layout 컴포넌트
  */
-if (import.meta.env.DEV) {
-  console.log("🚀 Biz AI Admin Portal 앱 초기화");
-  console.log("📍 현재 라우트:", router.currentRoute.value);
-}
-</script>
+const currentLayout = computed(() => {
+  const layoutName = route.meta.layout as string | undefined;
+  console.log("📍 현재 route:", route.path);
+  console.log("🎨 현재 layout:", layoutName);
+  console.log("🔒 로그인 상태:", authStore.isLoggedIn);
 
-<style scoped lang="scss">
+  if (!layoutName) {
+    console.warn("⚠️ layout이 정의되지 않았습니다!");
+    return undefined;
+  }
+
+  const layout = layoutComponents[layoutName as keyof typeof layoutComponents];
+  if (!layout) {
+    console.warn(`⚠️ 존재하지 않는 layout: ${layoutName}`);
+    return undefined;
+  }
+
+  return layout;
+});
+
+onBeforeMount(() => {
+  isLoading.value = true;
+});
+
 /**
- * App.vue 스타일
- * 
- * <router-view>는 페이지 컴포넌트를 렌더링하므로,
- * 일반적으로 App.vue에는 전역 스타일만 정의합니다.
- * 
- * 각 페이지의 스타일은 개별 컴포넌트 파일에서 정의합니다.
+ * App 초기화
+ *
+ * Vue3 Composition API:
+ * - onMounted: 컴포넌트 마운트 후 실행
+ * - async/await: 비동기 처리
  */
+onMounted(async () => {
+  console.log("🚀 ============================================");
+  console.log("🚀 App.vue 초기화 시작");
+  console.log("🚀 ============================================");
 
-:global(body) {
-  margin: 0;
-  padding: 0;
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
-    "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
-  background: #f5f7fa;
-}
+  try {
+    // 1. 세션 복구
+    console.log("🔐 세션 복구 시도...");
+    authStore.restoreSession();
 
-:global(#app) {
-  width: 100%;
-  min-height: 100vh;
-}
-</style>
+    // 2. 자동 로그인
+    console.log("🔐 자동 로그인 시도...");
+    const isLoggedIn = await autoLogin(authStore, testAuthStore);
+
+    // 3. 라우팅 (비동기 완료 대기!)
+    console.log("🧭 라우팅 처리 중...");
+    await nextTick();
+
+    if (isLoggedIn && route.path === "/login") {
+      console.log("✅ 로그인 완료, 메인 페이지로 이동");
+      // ✅ router.push 결과를 await!
+      await router.push("/");
+    } else if (!isLoggedIn && route.path !== "/login") {
+      console.log("⚠️ 로그인 필요, 로그인 페이지로 이동");
+      await router.push("/login");
+    }
+
+    // 라우팅 완료 후 다시 대기
+    await nextTick();
+
+    console.log("🎉 ============================================");
+    console.log("🎉 앱 초기화 완료!");
+    console.log("📍 현재 경로:", router.currentRoute.value.path);
+    console.log("🔑 로그인 상태:", authStore.isLoggedIn);
+    console.log("👤 사용자:", authStore.user);
+    console.log("🎨 현재 layout:", currentLayout.value?.name || "none");
+    console.log("🎉 ============================================");
+  } catch (error) {
+    console.error("❌ 앱 초기화 중 오류:", error);
+    router.push("/login");
+  } finally {
+    isLoading.value = false;
+  }
+});
+</script>

@@ -337,10 +337,10 @@ onMounted(async () => {
 
   try {
     // 카드 및 에이전트 목록 로드
-    await Promise.all([
-      contentStore.fetchCards(office.value),
-      contentStore.fetchAgents(),
-    ]);
+    // await Promise.all([
+    //   contentStore.fetchCards(office.value),
+    //   contentStore.fetchAgents(),
+    // ]);
   } catch (err) {
     const errorMessage =
       err instanceof Error ? err.message : "데이터 로드 실패";
