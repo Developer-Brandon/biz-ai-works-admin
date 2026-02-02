@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    /* ✅ composite: true 필수 */
+    "composite": true,
+
+    /* ✅ noEmit: true 필수 */
+    "noEmit": true,
+
+    "skipLibCheck": true,
+    "module": "ESNext",
+
+    /* ✅ bundler로 설정 */
+    "moduleResolution": "bundler",
+
+    "allowSyntheticDefaultImports": true,
+    "strict": false,
+    "esModuleInterop": true
+  },
+
+  /* Vite 설정 파일들 포함 */
+  "include": [
+    "vite.config.ts",
+    "vitest.config.ts",
+    "cypress.config.ts",
+    "playwright.config.ts"
+  ]
+}
