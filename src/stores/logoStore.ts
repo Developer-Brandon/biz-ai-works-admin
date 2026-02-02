@@ -61,14 +61,14 @@ export const useLogoStore = defineStore(
      * 현재 선택된 로고 객체
      */
     const selectedLogo = computed(() => {
-      return logos.value.find((logo) => logo.id === selectedLogoId.value);
+      return logos.value.find((logo: Logo) => logo.id === selectedLogoId.value);
     });
 
     /**
      * 선택되지 않은 로고 목록
      */
     const unselectedLogos = computed(() => {
-      return logos.value.filter((logo) => !logo.isSelected);
+      return logos.value.filter((logo: Logo) => !logo.isSelected);
     });
 
     /**
@@ -105,7 +105,7 @@ export const useLogoStore = defineStore(
         logos.value = await logoService.getLogoList(office);
 
         // 선택된 로고 ID 업데이트
-        const selected = logos.value.find((logo) => logo.isSelected);
+        const selected = logos.value.find((logo: Logo) => logo.isSelected);
         if (selected) {
           selectedLogoId.value = selected.id;
         }
@@ -157,7 +157,7 @@ export const useLogoStore = defineStore(
         await logoService.selectLogo(logoId, office);
 
         // 로컬 상태 업데이트
-        logos.value.forEach((logo) => {
+        logos.value.forEach((logo: Logo) => {
           logo.isSelected = logo.id === logoId;
         });
         selectedLogoId.value = logoId;
@@ -185,7 +185,7 @@ export const useLogoStore = defineStore(
         await logoService.deleteLogo(logoId, office);
 
         // 로컬 상태 업데이트
-        logos.value = logos.value.filter((logo) => logo.id !== logoId);
+        logos.value = logos.value.filter((logo: Logo) => logo.id !== logoId);
 
         // 삭제된 로고가 선택된 로고면 선택 해제
         if (selectedLogoId.value === logoId) {

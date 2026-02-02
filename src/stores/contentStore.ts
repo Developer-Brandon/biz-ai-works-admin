@@ -364,7 +364,6 @@ export const useContentStore = defineStore(
     persist: {
       key: "content-store",
       storage: localStorage,
-      paths: ["cards", "agents", "currentEditingCard"],
     },
   },
 );
