@@ -6,6 +6,11 @@
  * - 토큰 유효성 검증
  * - 개발 환경에서만 테스트 계정으로 자동 로그인
  * - 프로덕션에서는 저장된 토큰 복구만 수행
+ *
+ * Vue 2 vs Vue 3:
+ * - Vue 2: vuex store의 commit으로 상태 변경
+ * - Vue 3: composition API store의 action 함수 호출
+ * Vue 3가 더 직관적이고 함수형입니다
  */
 
 import { authApi } from "@/api/modules/authApi";
@@ -16,16 +21,16 @@ import type { TestAuthStore } from "@/stores/useTestAuthStore";
  * 자동 로그인 실행
  *
  * 실행 순서:
- * 1. localStorage에서 저장된 토큰 확인
- * 2. 토큰이 있으면 인증 상태 복구
+ * 1. Pinia store에서 저장된 토큰 확인
+ * 2. 토큰이 있으면 인증 상태 복구 (localStorage가 아닌 Pinia state 사용!)
  * 3. 토큰이 없고 개발 환경이면 테스트 계정으로 자동 로그인
  * 4. 모두 실패하면 로그인 필요 상태로 반환
  *
  * 동작 흐름:
  * ```
  * autoLogin()
- *   ├─ 저장된 토큰 있음?
- *   │  └─ YES: 기존 토큰 복원 (return true)
+ *   ├─ Pinia store에 저장된 토큰 있음?
+ *   │  └─ YES: 기존 토큰 복원 (return true) ✅ localStorage 접근 없음!
  *   │  └─ NO: 다음 단계로
  *   │
  *   ├─ 개발 환경?
@@ -44,6 +49,9 @@ import type { TestAuthStore } from "@/stores/useTestAuthStore";
  * 사용 예시:
  * ```typescript
  * // App.vue에서
+ * const authStore = useAuthStore()
+ * const testAuthStore = useTestAuthStore()
+ *
  * const isLoggedIn = await autoLogin(authStore, testAuthStore)
  * if (isLoggedIn) {
  *   router.push('/admin')
@@ -61,28 +69,23 @@ export async function autoLogin(
     console.log("🔄 자동 로그인 프로세스 시작");
     console.log("🔄 ========================================");
 
-    // ========== 단계 1: localStorage에서 저장된 토큰 확인 ==========
-    console.log("📍 단계 1: 저장된 토큰 확인 중...");
-    const savedAccessToken = localStorage.getItem("accessToken");
-    const savedRefreshToken = localStorage.getItem("refreshToken");
+    // ========== 단계 1: Pinia store에서 저장된 토큰 확인 ==========
+    console.log("📍 단계 1: Pinia store에 저장된 토큰 확인 중...");
+
+    // localStorage가 아닌 Pinia state에서 직접 읽음!
+    // Pinia persistence가 이미 localStorage에서 복원했으므로
+    // authStore의 ref 값을 바로 사용하면 됨
+    const savedAccessToken = authStore.accessToken;
+    const savedRefreshToken = authStore.refreshToken;
 
     if (savedAccessToken && savedRefreshToken) {
-      console.log("✅ 저장된 토큰 발견!");
-
-      // 기존 토큰 메모리에 복원
-      authStore.setAuthData({
-        accessToken: savedAccessToken,
-        refreshToken: savedRefreshToken,
-        email: localStorage.getItem("userEmail") || "",
-        isInitialPassword: localStorage.getItem("isInitialPassword") === "true",
-      });
-
+      console.log("✅ Pinia store에 저장된 토큰 발견!");
       console.log("✅ 자동 로그인 성공 (저장된 토큰 사용)");
       console.log("🔄 ========================================");
       return true;
     }
 
-    console.log("⚠️ 저장된 토큰 없음");
+    console.log("⚠️ Pinia store에 저장된 토큰 없음");
 
     // ========== 단계 2: 개발 환경에서 테스트 계정 자동 로그인 ==========
     if (import.meta.env.DEV) {
@@ -98,7 +101,6 @@ export async function autoLogin(
       }
 
       console.log(`📧 테스트 이메일: ${testEmail}`);
-      console.log(`🔐 테스트 비밀번호: ${testPassword}`);
 
       try {
         // 2-1. 로그인 페이로드 생성
@@ -132,8 +134,11 @@ export async function autoLogin(
 
         console.log("✅ 로그인 API 성공");
 
-        // 2-3. 토큰 저장 및 상태 업데이트
-        console.log("🔐 [2-3] 토큰 저장 중...");
+        // 2-3. 토큰 저장 (localStorage 직접 접근 제거! Pinia action 사용!)
+        console.log("🔐 [2-3] 토큰을 Pinia store에 저장 중...");
+
+        // 이제 authStore.setAuthData()를 호출하면
+        // Pinia persistence가 자동으로 localStorage에 저장합니다
         authStore.setAuthData({
           email: testEmail,
           accessToken,
@@ -141,13 +146,7 @@ export async function autoLogin(
           isInitialPassword,
         });
 
-        // localStorage에도 명시적으로 저장
-        localStorage.setItem("accessToken", accessToken);
-        localStorage.setItem("refreshToken", refreshToken);
-        localStorage.setItem("userEmail", testEmail);
-        localStorage.setItem("isInitialPassword", String(isInitialPassword));
-
-        console.log("✅ 토큰 저장 완료");
+        console.log("✅ 토큰 저장 완료 (Pinia persistence로 자동 저장됨)");
         console.log("✅ 자동 로그인 성공 (테스트 계정)!");
         console.log("🔄 ========================================");
         return true;
@@ -158,7 +157,7 @@ export async function autoLogin(
       }
     }
 
-    console.log("⚠️ 저장된 토큰 없음 & 프로덕션 환경");
+    console.log("⚠️ Pinia store에 저장된 토큰 없음 & 프로덕션 환경");
     console.log("⚠️ 수동 로그인 필요");
     console.log("🔄 ========================================");
     return false;
@@ -196,7 +195,8 @@ export async function autoLogin(
  *
  * 사용 예시:
  * ```typescript
- * const token = localStorage.getItem('accessToken')
+ * const authStore = useAuthStore()
+ * const token = authStore.accessToken
  * if (isTokenValid(token)) {
  *   // 토큰 유효 - API 호출 가능
  * } else {
@@ -211,26 +211,19 @@ export function isTokenValid(token: string | null): boolean {
   }
 
   try {
-    // JWT는 3부분으로 구성: header.payload.signature
     const parts = token.split(".");
     if (parts.length !== 3) {
       console.error("❌ 유효하지 않은 JWT 형식입니다 (3부분 아님)");
       return false;
     }
 
-    // payload를 Base64로 디코드
-    // payload는 JSON 형식으로 인코딩됨
     const payload = JSON.parse(atob(parts[1]));
 
-    // 만료 시간 확인 (exp는 Unix timestamp in seconds)
     if (payload.exp) {
-      const expiryTime = payload.exp * 1000; // 초를 밀리초로 변환
+      const expiryTime = payload.exp * 1000;
       const currentTime = Date.now();
       const remainingTime = expiryTime - currentTime;
-
-      // 토큰이 5분 이내 만료될 예정이면 false 반환
-      // (갱신 필요 상태로 판단)
-      const warningThreshold = 5 * 60 * 1000; // 5분
+      const warningThreshold = 5 * 60 * 1000;
 
       if (currentTime + warningThreshold > expiryTime) {
         const remainingSeconds = Math.round(remainingTime / 1000);
@@ -245,13 +238,10 @@ export function isTokenValid(token: string | null): boolean {
       return true;
     }
 
-    // exp가 없으면 유효한 것으로 간주
-    // (보통 admin 토큰 등에서 발생 가능)
     console.log("✅ 토큰 유효 (만료 시간 정보 없음)");
     return true;
   } catch (error) {
     console.error("❌ 토큰 검증 오류:", error);
-    console.error("❌ 에러 상세:", (error as Error).message);
     return false;
   }
 }
@@ -266,10 +256,10 @@ export function isTokenValid(token: string | null): boolean {
  *
  * 사용 예시:
  * ```typescript
- * const token = localStorage.getItem('accessToken')
- * const payload = decodeToken(token)
- * console.log('사용자 ID:', payload.sub)
- * console.log('만료 시간:', new Date(payload.exp * 1000))
+ * const authStore = useAuthStore()
+ * const payload = decodeToken(authStore.accessToken)
+ * console.log('사용자 ID:', payload?.sub)
+ * console.log('만료 시간:', new Date(payload?.exp * 1000))
  * ```
  */
 export function decodeToken(token: string | null): Record<string, any> | null {

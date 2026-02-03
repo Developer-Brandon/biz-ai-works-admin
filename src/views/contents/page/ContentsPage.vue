@@ -163,10 +163,10 @@ import { message } from "ant-design-vue";
 import { useContentStore } from "@/stores/contentStore";
 import { useImageStore } from "@/stores/imageStore";
 import type { Card } from "@/types";
-import CardDisplayGroup from "./components/CardDisplayGroup.vue";
-import CardEditForm from "./components/CardEditForm.vue";
-import PreviewModal from "./components/PreviewModal.vue";
-import DeploymentModal from "./components/DeploymentModal.vue";
+import CardDisplayGroup from "../components/CardDisplayGroup.vue";
+import CardEditForm from "../components/CardEditForm.vue";
+import PreviewModal from "../components/PreviewModal.vue";
+import DeploymentModal from "../components/DeploymentModal.vue";
 
 /**
  * 상태 정의

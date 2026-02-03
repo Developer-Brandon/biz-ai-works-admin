@@ -115,13 +115,14 @@ const handleMenuClick = (e: any) => {
 }
 
 .header__logo-image {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   object-fit: contain;
+  margin-right: 5px;
 }
 
 .header__logo-text {
-  font-size: 14px;
+  font-size: 18px;
   font-weight: 600;
 }
 

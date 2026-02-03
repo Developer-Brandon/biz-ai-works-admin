@@ -3,6 +3,11 @@
  *
  * 사용자 인증 정보와 토큰 관리
  * localStorage 자동 저장 (pinia-plugin-persistedstate)
+ *
+ * Vue 2 vs Vue 3 비교:
+ * - Vue 2: mutations + state (명령형)
+ * - Vue 3: composition API + action (함수형)
+ * Vue 3 Composition API는 더 간단하고 직관적입니다
  */
 
 import { defineStore } from "pinia";
@@ -10,6 +15,8 @@ import { ref, computed } from "vue";
 
 /**
  * 인증 상태 인터페이스
+ *
+ * 이 인터페이스의 모든 필드는 Pinia persistence를 통해 자동 저장됩니다
  */
 interface AuthState {
   accessToken: string | null;
@@ -29,6 +36,8 @@ export const useAuthStore = defineStore(
      *
      * API 요청 시 Authorization 헤더에 포함됨
      * 만료 시간: 보통 1시간
+     * 
+     * Pinia persistence가 자동으로 localStorage에 저장합니다
      */
     const accessToken = ref<string | null>(null);
 
@@ -37,11 +46,15 @@ export const useAuthStore = defineStore(
      *
      * Access Token 만료 시 새 토큰 발급용
      * 만료 시간: 보통 7일 또는 30일
+     * 
+     * Pinia persistence가 자동으로 localStorage에 저장합니다
      */
     const refreshToken = ref<string | null>(null);
 
     /**
      * 사용자 이메일
+     * 
+     * Pinia persistence가 자동으로 localStorage에 저장합니다
      */
     const email = ref<string | null>(null);
 
@@ -50,11 +63,15 @@ export const useAuthStore = defineStore(
      *
      * true: 첫 로그인 후 비밀번호 변경 필요
      * false: 일반 사용자
+     * 
+     * Pinia persistence가 자동으로 localStorage에 저장합니다
      */
     const isInitialPassword = ref(false);
 
     /**
      * 저장된 이메일 (아이디 저장 체크 시)
+     * 
+     * Pinia persistence가 자동으로 localStorage에 저장합니다
      */
     const savedEmail = ref<string | null>(null);
 
@@ -77,18 +94,42 @@ export const useAuthStore = defineStore(
 
     /**
      * Authorization 헤더 값
+     *
+     * API 요청 시 사용됨
+     * 예: "Bearer eyJhbGciOiJIUzI1NiIs..."
      */
     const authHeader = computed(() => {
       if (!accessToken.value) return null;
       return `Bearer ${accessToken.value}`;
     });
 
+    /**
+     * Refresh Token 존재 여부
+     *
+     * 토큰 갱신 가능 여부 판단용
+     */
+    const hasRefreshToken = computed(() => !!refreshToken.value);
+
     // ========== Actions (메서드) ==========
 
     /**
-     * 인증 정보 설정
+     * 인증 정보 일괄 설정
+     *
+     * 로그인 성공 후 호출됩니다
+     * Pinia persistence가 자동으로 이 값들을 localStorage에 저장합니다
      *
      * @param authData - 인증 정보
+     *
+     * 사용 예시:
+     * ```typescript
+     * const authStore = useAuthStore()
+     * authStore.setAuthData({
+     *   accessToken: 'eyJhbGc...',
+     *   refreshToken: 'eyJhbGc...',
+     *   email: 'user@example.com',
+     *   isInitialPassword: false
+     * })
+     * ```
      */
     function setAuthData(authData: Partial<AuthState>): void {
       if (authData.accessToken !== undefined) {
@@ -103,97 +144,87 @@ export const useAuthStore = defineStore(
       if (authData.isInitialPassword !== undefined) {
         isInitialPassword.value = authData.isInitialPassword;
       }
+      if (authData.savedEmail !== undefined) {
+        savedEmail.value = authData.savedEmail;
+      }
 
-      console.log("✅ 인증 정보 설정 완료", {
+      console.log("✅ 인증 정보 설정 완료 (Pinia persistence가 자동 저장)", {
         email: email.value,
         hasAccessToken: !!accessToken.value,
         hasRefreshToken: !!refreshToken.value,
+        savedEmail: savedEmail.value,
       });
     }
 
     /**
-     * 저장된 이메일 로드
+     * 아이디 저장
      *
-     * localStorage에서 저장된 이메일을 복원
-     */
-    function loadSavedEmail(): void {
-      const saved = localStorage.getItem("savedEmail");
-      if (saved) {
-        savedEmail.value = saved;
-        console.log("📧 저장된 이메일 로드:", saved);
-      }
-    }
-
-    /**
-     * 이메일 저장 (아이디 저장)
+     * localStorage가 아닌 Pinia state를 통해서만 관리합니다
+     * Pinia persistence가 자동으로 저장합니다
      *
      * @param emailToSave - 저장할 이메일
      */
     function saveEmail(emailToSave: string): void {
       savedEmail.value = emailToSave;
-      localStorage.setItem("savedEmail", emailToSave);
-      console.log("💾 이메일 저장:", emailToSave);
+      console.log("💾 이메일 저장됨 (Pinia persistence로 자동 저장):", emailToSave);
     }
 
     /**
      * 저장된 이메일 삭제
+     *
+     * localStorage 직접 접근 제거
+     * Pinia persistence가 자동으로 처리합니다
      */
     function clearSavedEmail(): void {
       savedEmail.value = null;
-      localStorage.removeItem("savedEmail");
-      console.log("🗑️ 저장된 이메일 삭제");
+      console.log("🗑️ 저장된 이메일 삭제됨");
+    }
+
+    /**
+     * Access Token만 갱신
+     *
+     * 토큰 갱신 시 사용됩니다
+     * Pinia persistence가 자동으로 저장합니다
+     *
+     * @param newAccessToken - 새로운 Access Token
+     */
+    function updateAccessToken(newAccessToken: string): void {
+      accessToken.value = newAccessToken;
+      console.log("🔄 Access Token 갱신됨 (Pinia persistence로 자동 저장)");
     }
 
     /**
      * 로그아웃
+     *
+     * 모든 인증 정보를 초기화합니다
+     * Pinia persistence가 자동으로 localStorage를 업데이트합니다
+     *
+     * 주의: localStorage.removeItem() 직접 호출 금지!
+     * Pinia state를 null로 설정하면 persistence가 자동 처리합니다
      */
     function logout(): void {
       accessToken.value = null;
       refreshToken.value = null;
       email.value = null;
       isInitialPassword.value = false;
+      // savedEmail은 유지 (아이디 저장 기능)
 
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
-      localStorage.removeItem("userEmail");
-
-      console.log("👋 로그아웃 완료");
+      console.log("👋 로그아웃 완료 (Pinia persistence로 자동 저장)");
     }
 
     /**
-     * 세션 복구
+     * 강제 로그아웃 (세션 만료 등)
      *
-     * 페이지 새로고침 시 localStorage에서 토큰 복원
+     * savedEmail도 함께 초기화합니다
      */
-    function restoreSession(): void {
-      const savedAccessToken = localStorage.getItem("accessToken");
-      const savedRefreshToken = localStorage.getItem("refreshToken");
-      const savedUserEmail = localStorage.getItem("userEmail");
+    function forceLogout(): void {
+      accessToken.value = null;
+      refreshToken.value = null;
+      email.value = null;
+      isInitialPassword.value = false;
+      savedEmail.value = null;
 
-      if (savedAccessToken && savedRefreshToken) {
-        setAuthData({
-          accessToken: savedAccessToken,
-          refreshToken: savedRefreshToken,
-          email: savedUserEmail || undefined,
-          isInitialPassword: false,
-        });
-        console.log("✅ 세션 복구 완료");
-      } else {
-        console.log("⚠️ 저장된 세션 없음");
-      }
-    }
-
-    /**
-     * Access Token 갱신
-     *
-     * Refresh Token을 사용하여 새로운 Access Token 발급
-     *
-     * @param newAccessToken - 새로운 Access Token
-     */
-    function updateAccessToken(newAccessToken: string): void {
-      accessToken.value = newAccessToken;
-      localStorage.setItem("accessToken", newAccessToken);
-      console.log("🔄 Access Token 갱신 완료");
+      console.log("🚨 강제 로그아웃 (세션 만료)");
     }
 
     return {
@@ -208,25 +239,30 @@ export const useAuthStore = defineStore(
       isLoggedIn,
       user,
       authHeader,
+      hasRefreshToken,
 
       // Actions
       setAuthData,
-      loadSavedEmail,
       saveEmail,
       clearSavedEmail,
-      logout,
-      restoreSession,
       updateAccessToken,
+      logout,
+      forceLogout,
     };
   },
   {
-    // ✅ persist 옵션을 직접 배열로 설정 (paths 없음)
-    persist: [
-      {
-        key: "auth-store",
-        storage: localStorage,
-      },
-    ],
+    /**
+     * Pinia persistence 설정
+     *
+     * 이 설정으로 인해 아래의 모든 state가 자동으로 localStorage에 저장됩니다
+     * 설정을 따로 하지 않으면 전체 state가 저장됩니다
+     */
+    persist: {
+      key: "auth-store",
+      storage: localStorage,
+      // paths를 명시하면 특정 필드만 저장 가능
+      // 예: paths: ['accessToken', 'refreshToken', 'email', 'savedEmail']
+    },
   },
 );
 

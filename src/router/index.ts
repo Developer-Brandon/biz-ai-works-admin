@@ -16,9 +16,9 @@
  */
 
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
-import Contents from "@/views/contents/Contents.vue";
-import Logo from "@/views/logo/Logo.vue";
-import ColorPalette from "@/views/color-palette/ColorPalette.vue";
+import Contents from "@/views/contents/page/ContentsPage.vue";
+import Logo from "@/views/logo/page/LogoPage.vue";
+import ColorPalette from "@/views/color-palette/page/ColorPalettePage.vue";
 
 /**
  * 라우트 배열 정의

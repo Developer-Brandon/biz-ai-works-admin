@@ -168,11 +168,11 @@ import {
 } from "@ant-design/icons-vue";
 import { message } from "ant-design-vue";
 import { useLogoStore } from "@/stores/logoStore";
-import LogoCard from "./components/LogoCard.vue";
-import LogoEditCard from "./components/LogoEditCard.vue";
-import LogoUploadCard from "./components/LogoUploadCard.vue";
-import LogoPreviewModal from "./components/LogoPreviewModal.vue";
-import DeploymentModal from "./components/DeploymentModal.vue";
+import LogoCard from "../components/LogoCard.vue";
+import LogoEditCard from "../components/LogoEditCard.vue";
+import LogoUploadCard from "../components/LogoUploadCard.vue";
+import LogoPreviewModal from "../components/LogoPreviewModal.vue";
+import DeploymentModal from "../components/DeploymentModal.vue";
 
 const logoStore = useLogoStore();
 

@@ -110,10 +110,10 @@ import { SaveOutlined, ReloadOutlined } from "@ant-design/icons-vue";
 import { message } from "ant-design-vue";
 import { useColorStore } from "@/stores/colorStore";
 import type { ColorPalette } from "@/types";
-import ColorGroupEditor from "./components/ColorGroupEditor.vue";
-import GradientColorEditor from "./components/GradientColorEditor.vue";
-import ColorPalettePreview from "./components/ColorPalettePreview.vue";
-import DeploymentModal from "./components/DeploymentModal.vue";
+import ColorGroupEditor from "../components/ColorGroupEditor.vue";
+import GradientColorEditor from "../components/GradientColorEditor.vue";
+import ColorPalettePreview from "../components/ColorPalettePreview.vue";
+import DeploymentModal from "../components/DeploymentModal.vue";
 
 const colorStore = useColorStore();
 
