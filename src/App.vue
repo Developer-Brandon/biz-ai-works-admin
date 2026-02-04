@@ -65,7 +65,7 @@ onMounted(async () => {
   try {
     // 1. 세션 복구
     console.log("🔐 세션 복구 시도...");
-    authStore.restoreSession();
+    // authStore.restoreSession();
 
     // 2. 자동 로그인
     console.log("🔐 자동 로그인 시도...");

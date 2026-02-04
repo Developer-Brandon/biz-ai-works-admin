@@ -4,10 +4,9 @@
     <!-- 페이지 헤더 -->
     <div class="page-header">
       <div class="header-top">
-        <h1 class="page-title">Logo Management</h1>
-        <p class="page-description">
-          로고는 좌측 상단에 노출되며, 최대 3개까지 업로드 가능합니다
-        </p>
+        <a-tag class="page-description">
+          ※ 로고는 좌측 상단에 노출되며, 최대 3개까지 업로드 가능합니다
+        </a-tag>
       </div>
 
       <div class="header-actions">
@@ -301,19 +300,26 @@ onMounted(async () => {
   margin-bottom: 24px;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
+
+  display: flex; // 👈 추가
+  justify-content: space-between; // 👈 추가
+  align-items: flex-start; // 👈 추가 (header-top과 header-actions의 위치 조정)
+  gap: 16px; // 👈 추가 (두 영역 간 간격)
 
   .header-top {
-    margin-bottom: 16px;
+    margin-bottom: 0; // 👈 기존 margin-bottom: 16px 제거
+    flex: 1; // 👈 추가 (header-top이 왼쪽에서 자유 공간 차지)
 
     .page-title {
       margin: 0;
       font-size: 24px;
       font-weight: 600;
       color: #262626;
+      transition: color 0.3s ease;
     }
 
     .page-description {
-      margin: 8px 0 0 0;
       font-size: 14px;
       color: #8c8c8c;
     }
@@ -325,15 +331,15 @@ onMounted(async () => {
     flex-wrap: wrap;
 
     .action-button {
-      transition: all 0.3s ease;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
-      &:hover:not(:disabled) {
+      &:hover {
         transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       }
     }
   }
 }
-
 .loading-spinner {
   display: flex;
   justify-content: center;

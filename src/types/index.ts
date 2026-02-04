@@ -24,12 +24,18 @@ export interface AuthResponse {
 // ========== Cards (Contents) ==========
 
 /**
- * 카드 타입 (QA 카드, 서비스 카드 등)
+ * 카드 타입
+ *
+ * - chatCard: AI 챗봇 (에이전트 연결)
+ * - questionCard: 자주 묻는 질문
+ * - serviceCard: 서비스 링크
  */
-export type CardType = "qaCard" | "serviceCard" | "operationCard";
+export type CardType = "chatCard" | "questionCard" | "serviceCard";
 
 /**
  * QA 카드 인터페이스
+ *
+ * 자주 묻는 질문과 답변을 저장합니다
  */
 export interface QaCard {
   id: string;
@@ -43,6 +49,8 @@ export interface QaCard {
 
 /**
  * 서비스 카드 인터페이스
+ *
+ * 외부 서비스나 링크를 연결합니다
  */
 export interface ServiceCard {
   id: string;
@@ -57,6 +65,8 @@ export interface ServiceCard {
 
 /**
  * 작업 카드 인터페이스
+ *
+ * 단계별 작업 가이드
  */
 export interface OperationCard {
   id: string;
@@ -70,22 +80,81 @@ export interface OperationCard {
 
 /**
  * 통합 Card 타입
+ *
+ * 모든 카드 타입을 포함하는 인터페이스입니다
+ * cardType에 따라 다른 필드가 사용됩니다:
+ * - chatCard: agentId 사용
+ * - questionCard: questionList 사용
+ * - serviceCard: serviceContent 사용
  */
 export interface Card {
+  // 기본 필드
   id: string;
-  officeCode: string;
+  office?: string;
+  officeCode?: string;
   cardType: CardType;
-  cardId: string;
-  displayOrder: number;
-  cardThumbnailUrl: string | null;
+  displayOrder?: number;
+
+  // 콘텐츠 필드
   name: string;
-  description: string | null;
-  agentId: string | null;
-  content: string | null;
-  metadata: Record<string, any>;
+  description?: string | null;
+  cardThumbnailUrl?: string | null;
+
+  // 타입별 필드
+  // chatCard: agentId 사용
+  agentId?: string | null;
+
+  // questionCard: questionList 사용
+  questionList?: string[];
+
+  // serviceCard: serviceContent 사용
+  serviceContent?: string | null;
+
+  // 공통 필드
+  content?: string | null;
+  metadata?: Record<string, any>;
   isDeleted?: boolean;
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+/**
+ * Agent Card 타입
+ *
+ * AI 챗봇 에이전트와 연결된 카드
+ */
+export interface AgentCard extends Card {
+  cardType: "chatCard";
+  agentId: string;
+}
+
+/**
+ * Q&A Card 타입
+ *
+ * 자주 묻는 질문 모음
+ */
+export interface QaCardType extends Card {
+  cardType: "questionCard";
+  questionList: string[];
+}
+
+/**
+ * Service Card 타입
+ *
+ * 서비스 설명 및 링크
+ */
+export interface ServiceCardType extends Card {
+  cardType: "serviceCard";
+  serviceContent: string;
+}
+
+/**
+ * 카드 요청 타입 (API 요청용)
+ */
+export interface CardRequest extends Partial<Card> {
+  cardId?: string;
+  office?: string;
+  officeCode?: string;
 }
 
 // ========== Images ==========
@@ -192,23 +261,29 @@ export interface ColorItem {
 
 /**
  * AI 에이전트 인터페이스
+ *
+ * 챗봇, AI 어시스턴트 등 대화형 에이전트를 나타냅니다
  */
 export interface Agent {
   id: string;
   name: string;
-  description: string;
-  icon: string;
-  type: "llm" | "custom";
-  config: Record<string, any>;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
+  description?: string;
+  avatar?: string;
+  icon?: string;
+  type?: "llm" | "custom";
+  config?: Record<string, any>;
+  status?: "active" | "inactive";
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 // ========== Operation Results ==========
 
 /**
  * 작업 결과 인터페이스
+ *
+ * API 호출 결과를 나타냅니다
  */
 export interface OperationResult {
   success: boolean;
@@ -219,12 +294,28 @@ export interface OperationResult {
 
 /**
  * API 응답 (일반적)
+ *
+ * 모든 API 응답의 기본 형식입니다
  */
 export interface ApiResponse<T = any> {
   success: boolean;
   message: string;
   data: T;
 }
+
+/**
+ * API 응답 (Agent List)
+ *
+ * 에이전트 목록 조회 응답
+ */
+export interface AgentListResponse extends ApiResponse<Agent[]> {}
+
+/**
+ * API 응답 (Card List)
+ *
+ * 카드 목록 조회 응답
+ */
+export interface CardListResponse extends ApiResponse<Card[]> {}
 
 // ========== UI States ==========
 
@@ -268,4 +359,21 @@ export interface BreadcrumbItem {
   label: string;
   path: string;
   active: boolean;
+}
+
+// ========== Deployment ==========
+
+/**
+ * 배포 상태
+ */
+export type DeploymentStatus = "success" | "error" | "pending";
+
+/**
+ * 배포 결과
+ */
+export interface DeploymentResult {
+  status: DeploymentStatus;
+  message: string;
+  timestamp: string;
+  details?: Record<string, any>;
 }

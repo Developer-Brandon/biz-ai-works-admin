@@ -4,7 +4,7 @@
     <!-- 페이지 헤더 -->
     <div class="page-header">
       <div class="header-top">
-        <h1 class="page-title">Color Palette</h1>
+        <!-- <h1 class="page-title">Color Palette</h1> -->
         <p class="page-description">서비스의 주요 색상을 설정할 수 있습니다</p>
       </div>
 
@@ -222,7 +222,6 @@ onMounted(async () => {
     }
 
     .page-description {
-      margin: 8px 0 0 0;
       font-size: 14px;
       color: #8c8c8c;
     }

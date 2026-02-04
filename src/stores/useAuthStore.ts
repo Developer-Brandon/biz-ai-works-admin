@@ -36,7 +36,7 @@ export const useAuthStore = defineStore(
      *
      * API 요청 시 Authorization 헤더에 포함됨
      * 만료 시간: 보통 1시간
-     * 
+     *
      * Pinia persistence가 자동으로 localStorage에 저장합니다
      */
     const accessToken = ref<string | null>(null);
@@ -46,14 +46,14 @@ export const useAuthStore = defineStore(
      *
      * Access Token 만료 시 새 토큰 발급용
      * 만료 시간: 보통 7일 또는 30일
-     * 
+     *
      * Pinia persistence가 자동으로 localStorage에 저장합니다
      */
     const refreshToken = ref<string | null>(null);
 
     /**
      * 사용자 이메일
-     * 
+     *
      * Pinia persistence가 자동으로 localStorage에 저장합니다
      */
     const email = ref<string | null>(null);
@@ -63,14 +63,14 @@ export const useAuthStore = defineStore(
      *
      * true: 첫 로그인 후 비밀번호 변경 필요
      * false: 일반 사용자
-     * 
+     *
      * Pinia persistence가 자동으로 localStorage에 저장합니다
      */
     const isInitialPassword = ref(false);
 
     /**
      * 저장된 이메일 (아이디 저장 체크 시)
-     * 
+     *
      * Pinia persistence가 자동으로 localStorage에 저장합니다
      */
     const savedEmail = ref<string | null>(null);
@@ -166,7 +166,10 @@ export const useAuthStore = defineStore(
      */
     function saveEmail(emailToSave: string): void {
       savedEmail.value = emailToSave;
-      console.log("💾 이메일 저장됨 (Pinia persistence로 자동 저장):", emailToSave);
+      console.log(
+        "💾 이메일 저장됨 (Pinia persistence로 자동 저장):",
+        emailToSave,
+      );
     }
 
     /**
@@ -207,8 +210,6 @@ export const useAuthStore = defineStore(
       refreshToken.value = null;
       email.value = null;
       isInitialPassword.value = false;
-      // savedEmail은 유지 (아이디 저장 기능)
-
       console.log("👋 로그아웃 완료 (Pinia persistence로 자동 저장)");
     }
 
@@ -225,6 +226,32 @@ export const useAuthStore = defineStore(
       savedEmail.value = null;
 
       console.log("🚨 강제 로그아웃 (세션 만료)");
+    }
+
+    /**
+     * 세션 복원 (앱 초기화 시 호출)
+     *
+     * Pinia persistence가 자동으로 localStorage에서 로드하므로,
+     * 이 메서드는 추가 검증 등이 필요할 때만 사용합니다
+     *
+     * 예: Access Token 만료 여부 확인, 토큰 갱신 등
+     */
+    async function restoreSession(): Promise<void> {
+      try {
+        // 토큰이 있으면 유효성 검증
+        if (accessToken.value) {
+          console.log("🔄 저장된 세션 복원됨");
+
+          // 토큰 유효성 검증 API 호출 (선택사항)
+          // const isValid = await validateToken(accessToken.value)
+          // if (!isValid) {
+          //   logout()
+          // }
+        }
+      } catch (err) {
+        console.error("세션 복원 실패:", err);
+        logout();
+      }
     }
 
     return {
@@ -248,6 +275,7 @@ export const useAuthStore = defineStore(
       updateAccessToken,
       logout,
       forceLogout,
+      restoreSession,
     };
   },
   {
