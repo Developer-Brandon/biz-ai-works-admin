@@ -124,29 +124,6 @@
 </template>
 
 <script setup lang="ts">
-/**
- * CardDisplayGroup 컴포넌트 - 수정 버전
- *
- * 조회 모드에서 카드를 표시하는 컴포넌트
- * 각 카드 타입별로 가로(horizontal) 레이아웃으로 표시
- *
- * 레이아웃:
- * - Agent Card: 왼쪽(정보) + 오른쪽(이미지)
- * - Q&A Card: 상단(헤더) + 가운데(질문 + 답변버튼)
- * - Service Card: 왼쪽(정보) + 오른쪽(이미지)
- *
- * Props:
- * - card: 표시할 카드 정보
- * - cardNumber: 카드 번호 (1, 2, 3)
- * - agents: 에이전트 목록
- *
- * Vue3 특징:
- * - Composition API 사용
- * - computed로 계산 로직 분리
- * - 트렌디한 애니메이션 적용
- */
-
-import { computed } from "vue";
 import type { Card, Agent } from "@/types";
 
 interface Props {
@@ -159,17 +136,19 @@ const props = defineProps<Props>();
 
 /**
  * 에이전트명 조회
+ *
+ * null을 반환할 수 없도록 기본값 처리
  */
-function getAgentName(agentId?: string): string | null {
-  if (!agentId) return null;
+function getAgentName(agentId?: string | null): string {
+  if (!agentId) return "미설정";
   const agent = props.agents.find((a) => a.id === agentId);
-  return agent?.name || null;
+  return agent?.name || "미설정";
 }
 
 /**
  * 날짜 포매팅
  */
-function formatDate(dateString?: string): string {
+function formatDate(dateString?: string | null): string {
   if (!dateString) return "미설정";
   const date = new Date(dateString);
   return date.toISOString().split("T")[0];

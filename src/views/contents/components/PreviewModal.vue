@@ -93,14 +93,6 @@
 </template>
 
 <script setup lang="ts">
-/**
- * PreviewModal 컴포넌트
- *
- * 역할: 서비스 페이지 미리보기를 모달로 표시
- * Props: visible (모달 표시 여부), cards (카드 목록), agents (에이전트 목록)
- * Emits: update:visible (모달 닫기)
- */
-
 import type { Card, Agent } from "@/types";
 
 interface Props {
@@ -109,13 +101,33 @@ interface Props {
   agents: Agent[];
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  visible: false,
+  cards: () => [],
+  agents: () => [],
+});
 
 const emit = defineEmits<{
   "update:visible": [value: boolean];
 }>();
-</script>
 
+/**
+ * 카드 타입 체크
+ *
+ * "qaCard"는 "questionCard"로 수정
+ */
+const isQuestionCard = (card: Card): boolean => {
+  return card.cardType === "questionCard"; // "qaCard" → "questionCard"
+};
+
+const isChatCard = (card: Card): boolean => {
+  return card.cardType === "chatCard";
+};
+
+const isServiceCard = (card: Card): boolean => {
+  return card.cardType === "serviceCard";
+};
+</script>
 <style scoped lang="scss">
 /**
  * PreviewModal 스타일
