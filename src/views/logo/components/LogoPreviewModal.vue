@@ -22,11 +22,6 @@
         </div>
 
         <div class="detail-item">
-          <span class="detail-label">Size:</span>
-          <span class="detail-value">{{ formatFileSize(logo.size || 0) }}</span>
-        </div>
-
-        <div class="detail-item">
           <span class="detail-label">Upload Date:</span>
           <span class="detail-value">{{ formatDate(logo.createdAt) }}</span>
         </div>

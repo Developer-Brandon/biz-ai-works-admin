@@ -133,9 +133,18 @@ function getEndpoint(localPath: string, proxyPath: string): string {
  */
 async function getPublicKey(): Promise<PublicKeyResponse> {
   const endpoint = getEndpoint("/api/auth/public-key", "/api/auth/public-key");
-
   console.log(`📤 [RSA Public Key 조회] ${endpoint}`);
-  return http.post<PublicKeyResponse>(endpoint, {});
+
+  // http.post는 ApiResponse<T> | NetworkError를 반환하므로 처리 필요
+  const response = await http.post<PublicKeyResponse>(endpoint, {});
+
+  // 성공 여부 확인
+  if (!response.success) {
+    throw new Error(response.message || "RSA Public Key 조회 실패");
+  }
+
+  // data는 null일 수 있으므로 타입 단언
+  return response.data as PublicKeyResponse;
 }
 
 /**
@@ -162,13 +171,19 @@ async function login(
   iv: string,
 ): Promise<LoginResponse> {
   const endpoint = getEndpoint("/api/auth/login", "/api/auth/login");
-
   console.log(`📤 [로그인] ${endpoint}`);
-  return http.post<LoginResponse>(endpoint, {
+
+  const response = await http.post<LoginResponse>(endpoint, {
     encryptedData,
     encryptedAesKey,
     iv,
   });
+
+  if (!response.success) {
+    throw new Error(response.message || "로그인 실패");
+  }
+
+  return response.data as LoginResponse;
 }
 
 /**
@@ -186,9 +201,15 @@ async function login(
  */
 async function refresh(): Promise<RefreshResponse> {
   const endpoint = getEndpoint("/api/auth/refresh", "/api/auth/refresh");
-
   console.log(`📤 [토큰 갱신] ${endpoint}`);
-  return http.post<RefreshResponse>(endpoint, {});
+
+  const response = await http.post<RefreshResponse>(endpoint, {});
+
+  if (!response.success) {
+    throw new Error(response.message || "토큰 갱신 실패");
+  }
+
+  return response.data as RefreshResponse;
 }
 
 /**
@@ -214,12 +235,10 @@ async function changePassword(
     throw new Error("currentPassword와 newPassword는 필수입니다");
   }
 
-  // 비밀번호 길이 검증
   if (passwordData.newPassword.length < 8) {
     throw new Error("새 비밀번호는 최소 8자 이상이어야 합니다");
   }
 
-  // 비밀번호 일치 검증
   if (passwordData.newPassword !== passwordData.confirmPassword) {
     throw new Error("새 비밀번호가 일치하지 않습니다");
   }
@@ -228,16 +247,21 @@ async function changePassword(
     "/api/auth/change-password",
     "/api/auth/change-password",
   );
-
   console.log(`📤 [비밀번호 변경] ${endpoint}`);
-  return http.post<PasswordChangeResponse>(endpoint, {
+
+  const response = await http.post<PasswordChangeResponse>(endpoint, {
     currentPassword: passwordData.currentPassword,
     newPassword: passwordData.newPassword,
     confirmPassword: passwordData.confirmPassword,
     passwordMatch: true,
   });
-}
 
+  if (!response.success) {
+    throw new Error(response.message || "비밀번호 변경 실패");
+  }
+
+  return response.data as PasswordChangeResponse;
+}
 /**
  * 5️⃣ 초기 비밀번호 변경
  *
@@ -287,13 +311,21 @@ async function changeInitialPassword(
   );
 
   console.log(`📤 [초기 비밀번호 변경] ${endpoint}`);
-  return http.post<PasswordChangeResponse>(endpoint, {
+
+  // 응답 처리 추가
+  const response = await http.post<PasswordChangeResponse>(endpoint, {
     email: passwordData.email,
     currentPassword: passwordData.currentPassword,
     newPassword: passwordData.newPassword,
     confirmPassword: passwordData.confirmPassword,
     passwordMatch: true,
   });
+
+  if (!response.success) {
+    throw new Error(response.message || "초기 비밀번호 변경 실패");
+  }
+
+  return response as PasswordChangeResponse;
 }
 
 /**
@@ -318,9 +350,9 @@ async function changeInitialPassword(
  *   password: 'plainPassword123'
  * })
  * const loginResult = await authApi.login(
- *   payload.data.encryptedData,
- *   payload.data.encryptedAesKey,
- *   payload.data.iv
+ *   payload.encryptedData,
+ *   payload.encryptedAesKey,
+ *   payload.iv
  * )
  * ```
  */
@@ -335,10 +367,17 @@ async function generateLoginPayload(
   console.log(`📤 [로그인 페이로드 생성] ${endpoint}`);
   console.log(`🌐 환경: ${ENV.IS_DEVELOPMENT ? "로컬" : "배포"}`);
 
-  return http.post<LoginPayloadResponse>(endpoint, {
+  // 응답 처리 추가
+  const response = await http.post<LoginPayloadData>(endpoint, {
     email: credentials.email,
     password: credentials.password,
   });
+
+  if (!response.success) {
+    throw new Error(response.message || "로그인 페이로드 생성 실패");
+  }
+
+  return response as LoginPayloadResponse;
 }
 
 // ========== Export ==========

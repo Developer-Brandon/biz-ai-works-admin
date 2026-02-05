@@ -7,14 +7,7 @@
 
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
-import type {
-  Card,
-  AgentCard,
-  QaCard,
-  ServiceCard,
-  Agent,
-  OperationResult,
-} from "@/types";
+import type { Card, AgentCard, QaCard, ServiceCard, Agent } from "@/types";
 import { contentService } from "@/services/contentService";
 import { MOCK_CARDS, MOCK_AGENTS } from "./mockData";
 
@@ -50,7 +43,7 @@ export const useContentStore = defineStore(
       return cards.value.filter((card) => card.cardType === "chatCard");
     });
 
-    const qaCards = computed(() => {
+    const questionCards = computed(() => {
       return cards.value.filter((card) => card.cardType === "questionCard");
     });
 
@@ -326,7 +319,7 @@ export const useContentStore = defineStore(
       // Getters
       displayCards,
       agentCards,
-      qaCards,
+      questionCards,
       serviceCards,
       getCardById,
       getAgentById,

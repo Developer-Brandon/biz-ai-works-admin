@@ -333,7 +333,7 @@ export const useColorStore = defineStore(
     persist: {
       key: "color-store",
       storage: localStorage,
-      paths: ["colorPalette", "defaultPalette"],
+      pick: ["colorPalette", "defaultPalette"],
     },
   },
 );

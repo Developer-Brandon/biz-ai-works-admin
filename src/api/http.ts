@@ -24,11 +24,21 @@ import { requestInterceptor, responseInterceptor } from "./interceptor";
 
 // ========== 타입 정의 ==========
 
+// HTTP 메서드 타입
+type httpMethod =
+  | "GET"
+  | "POST"
+  | "PUT"
+  | "DELETE"
+  | "PATCH"
+  | "HEAD"
+  | "OPTIONS";
+
 /**
  * 요청 설정 인터페이스
  */
 interface RequestConfig extends RequestInit {
-  method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH" | "HEAD" | "OPTIONS";
+  method?: httpMethod;
   headers?: Record<string, string>;
   body?: string;
   timeout?: number;
@@ -38,7 +48,7 @@ interface RequestConfig extends RequestInit {
  * 요청 옵션 인터페이스
  */
 interface RequestOptions {
-  method?: string;
+  method?: httpMethod;
   headers?: Record<string, string>;
   body?: string | Record<string, any>;
   timeout?: number;
@@ -115,14 +125,23 @@ async function request<T = any>(
       fullUrl = `${API_BASE_URL}${url}`;
     }
   }
-
   console.log(`📡 [HTTP ${options.method || "GET"}] ${fullUrl}`);
+  let bodyString: string | undefined = undefined;
+  if (options.body) {
+    if (typeof options.body === "string") {
+      bodyString = options.body;
+    } else {
+      // Record<string, any> 타입인 경우 JSON으로 변환
+      bodyString = JSON.stringify(options.body);
+    }
+  }
 
   // ========== 기본 설정 병합 ==========
   const config: RequestConfig = {
-    method: "GET" as const,
+    method: options.method as httpMethod,
     headers: { ...DEFAULT_HEADERS },
-    ...options,
+    body: bodyString,
+    timeout: options.timeout || 30000,
   };
 
   console.log("📌 config (인터셉터 적용 전):", config);

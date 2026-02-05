@@ -13,7 +13,7 @@
 
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
-import type { Logo, OperationResult } from "@/types";
+import type { Logo } from "@/types";
 import { logoService } from "@/services/logoService";
 
 /**
@@ -59,9 +59,14 @@ export const useLogoStore = defineStore(
 
     /**
      * 현재 선택된 로고 객체
+     * ❗ undefined → null 로 명확히 통일
      */
-    const selectedLogo = computed(() => {
-      return logos.value.find((logo: Logo) => logo.id === selectedLogoId.value);
+    const selectedLogo = computed<Logo | null>(() => {
+      if (!selectedLogoId.value) return null;
+      return (
+        logos.value.find((logo: Logo) => logo.id === selectedLogoId.value) ??
+        null
+      );
     });
 
     /**
@@ -106,9 +111,7 @@ export const useLogoStore = defineStore(
 
         // 선택된 로고 ID 업데이트
         const selected = logos.value.find((logo: Logo) => logo.isSelected);
-        if (selected) {
-          selectedLogoId.value = selected.id;
-        }
+        selectedLogoId.value = selected ? selected.id : null;
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : "로고 목록 조회 실패";
@@ -244,7 +247,7 @@ export const useLogoStore = defineStore(
     persist: {
       key: "logo-store",
       storage: localStorage,
-      paths: ["logos", "selectedLogoId"],
+      pick: ["logos", "selectedLogoId"],
     },
   },
 );

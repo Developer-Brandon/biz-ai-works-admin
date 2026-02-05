@@ -57,7 +57,7 @@
             </template>
 
             <!-- Q&A Card 미리보기 -->
-            <template v-else-if="card.cardType === 'qaCard'">
+            <template v-else-if="card.cardType === 'questionCard'">
               <div class="qa-card-preview">
                 <h3 class="card-title">Q&A</h3>
 
@@ -114,10 +114,10 @@ const emit = defineEmits<{
 /**
  * 카드 타입 체크
  *
- * "qaCard"는 "questionCard"로 수정
+ * "questionCard"는 "questionCard"로 수정
  */
 const isQuestionCard = (card: Card): boolean => {
-  return card.cardType === "questionCard"; // "qaCard" → "questionCard"
+  return card.cardType === "questionCard"; // "questionCard" → "questionCard"
 };
 
 const isChatCard = (card: Card): boolean => {

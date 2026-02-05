@@ -22,13 +22,7 @@
  */
 
 import { request } from "@/utils/request";
-import type {
-  Image,
-  ImageUploadResponse,
-  BatchImageUploadResponse,
-  ImageUploadResult,
-  ApiResponse,
-} from "@/types";
+import type { Image, ImageUploadResponse, ApiResponse } from "@/types";
 
 /**
  * 이미지 조회
@@ -147,63 +141,9 @@ export async function uploadImage(
       formData,
     );
 
-    return response.url;
+    return response.message;
   } catch (error) {
     console.error("이미지 업로드 실패:", error);
-    throw error;
-  }
-}
-
-/**
- * 여러 이미지 일괄 업로드
- *
- * 여러 이미지를 한 번에 업로드합니다
- * 파일 순서와 imageTypes 순서가 일치해야 함
- *
- * @param office - 회사 코드
- * @param imageTypes - 이미지 타입 배열
- * @param files - 업로드할 파일 배열 (순서 일치 필수)
- * @returns Promise<업로드 결과 배열>
- *
- * 사용 예시:
- * ```typescript
- * const results = await imageService.uploadImagesBatch(
- *   'ktds',
- *   ['favicon', 'logo', 'opengraph'],
- *   [faviconFile, logoFile, ogFile]
- * )
- *
- * // 성공한 것만 필터링
- * const successResults = results.filter(r => r.success)
- * ```
- */
-export async function uploadImagesBatch(
-  office: string,
-  imageTypes: string[],
-  files: File[],
-): Promise<ImageUploadResult[]> {
-  try {
-    if (imageTypes.length !== files.length) {
-      throw new Error("이미지 타입과 파일 개수가 일치하지 않습니다");
-    }
-
-    const formData = new FormData();
-    formData.append("office", office);
-    formData.append("imageTypes", JSON.stringify(imageTypes));
-
-    // 모든 파일을 'files' 이름으로 추가
-    files.forEach((file) => {
-      formData.append("files", file);
-    });
-
-    const response = await request.postFormData<BatchImageUploadResponse>(
-      "/api/app/info/image/upload/batch",
-      formData,
-    );
-
-    return response.results;
-  } catch (error) {
-    console.error("배치 이미지 업로드 실패:", error);
     throw error;
   }
 }
@@ -241,7 +181,6 @@ export async function deleteImage(
 export const imageService = {
   getImage,
   uploadImage,
-  uploadImagesBatch,
   deleteImage,
 };
 

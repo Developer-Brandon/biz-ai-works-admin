@@ -21,7 +21,6 @@
     <!-- 로고 정보 -->
     <div class="logo-info">
       <h4 class="logo-name">{{ fileName }}</h4>
-      <p class="logo-size">{{ formatFileSize(logo.size || 0) }}</p>
       <p class="logo-date">{{ formatDate(logo.updatedAt) }}</p>
     </div>
 

@@ -288,8 +288,6 @@ export const useAuthStore = defineStore(
     persist: {
       key: "auth-store",
       storage: localStorage,
-      // paths를 명시하면 특정 필드만 저장 가능
-      // 예: paths: ['accessToken', 'refreshToken', 'email', 'savedEmail']
     },
   },
 );

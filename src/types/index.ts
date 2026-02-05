@@ -187,7 +187,7 @@ export interface ImageUploadRequest {
 /**
  * 이미지 업로드 결과
  */
-export interface ImageUploadResult {
+export interface ImageUploadResponse {
   success: boolean;
   message: string;
   data: {
@@ -211,6 +211,8 @@ export interface Logo {
   uploadedAt: string;
   uploadedBy: string;
   isDeleted?: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 /**
@@ -228,13 +230,12 @@ export interface LogoUploadResponse {
  * 색상 팔레트 인터페이스
  */
 export interface ColorPalette {
-  id: string;
-  officeCode: string;
-  name: string;
-  colors: ColorGroup[];
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
+  mainColorHexCode: string;
+  mainHoverColorHexCode: string;
+  subColorHexCode: string;
+  subHoverColorHexCode: string;
+  startGradientColor: string;
+  endGradientColor: string;
 }
 
 /**
@@ -278,14 +279,14 @@ export interface Agent {
   updatedAt?: string;
 }
 
-// ========== Operation Results ==========
+// ========== Operation Responses ==========
 
 /**
  * 작업 결과 인터페이스
  *
  * API 호출 결과를 나타냅니다
  */
-export interface OperationResult {
+export interface OperationResponse {
   success: boolean;
   message: string;
   data?: any;
@@ -348,6 +349,8 @@ export interface AppPortalLogo {
   logoName: string;
   order: number;
   isSelected: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 // ========== Breadcrumb ==========
@@ -371,7 +374,7 @@ export type DeploymentStatus = "success" | "error" | "pending";
 /**
  * 배포 결과
  */
-export interface DeploymentResult {
+export interface DeploymentResponse {
   status: DeploymentStatus;
   message: string;
   timestamp: string;

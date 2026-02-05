@@ -12,7 +12,6 @@
 
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
-import type { Image, ImageUploadResult } from "@/types";
 import { imageService } from "@/services/imageService";
 
 /**
@@ -115,46 +114,6 @@ export const useImageStore = defineStore(
     }
 
     /**
-     * 여러 이미지 일괄 업로드
-     *
-     * @param office - 회사 코드
-     * @param imageTypes - 이미지 타입 배열
-     * @param files - 파일 배열
-     */
-    async function uploadImagesBatch(
-      office: string,
-      imageTypes: string[],
-      files: File[],
-    ): Promise<ImageUploadResult[]> {
-      loading.value = true;
-      error.value = null;
-
-      try {
-        const results = await imageService.uploadImagesBatch(
-          office,
-          imageTypes,
-          files,
-        );
-
-        // 성공한 이미지만 저장
-        results.forEach((result) => {
-          if (result.success) {
-            uploadedImages.value[result.imageType] = result.imageUrl;
-          }
-        });
-
-        return results;
-      } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : "배치 이미지 업로드 실패";
-        error.value = errorMessage;
-        throw err;
-      } finally {
-        loading.value = false;
-      }
-    }
-
-    /**
      * 이미지 삭제
      *
      * @param office - 회사 코드
@@ -230,7 +189,7 @@ export const useImageStore = defineStore(
 
       // Actions
       uploadImage,
-      uploadImagesBatch,
+      // uploadImagesBatch,
       deleteImage,
       setImageUrl,
       removeImageUrl,
@@ -242,7 +201,7 @@ export const useImageStore = defineStore(
     persist: {
       key: "image-store",
       storage: localStorage,
-      paths: ["uploadedImages"],
+      pick: ["uploadedImages"],
     },
   },
 );

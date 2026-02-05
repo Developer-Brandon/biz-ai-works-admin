@@ -35,7 +35,7 @@ export async function getCardList(office: string): Promise<Card[]> {
     });
 
     // response가 이미 Card[] 또는 { data: Card[] } 형태일 수 있으니 확인
-    return Array.isArray(response) ? response : response?.data || [];
+    return Array.isArray(response) ? response : [];
   } catch (error) {
     console.error("카드 목록 조회 실패:", error);
     throw error;
@@ -81,8 +81,12 @@ export async function addCard(
     const formData = new FormData();
 
     // 카드 정보 추가
-    formData.append("office", cardData.office);
-    formData.append("cardType", cardData.cardType);
+    if (cardData.office) {
+      formData.append("office", cardData.office);
+    }
+    if (cardData.cardType) {
+      formData.append("cardType", cardData.cardType);
+    }
     if (cardData.name) formData.append("name", cardData.name);
     if (cardData.description)
       formData.append("description", cardData.description);

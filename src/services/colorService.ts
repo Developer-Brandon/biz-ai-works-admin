@@ -12,12 +12,7 @@
  */
 
 import { request } from "@/utils/request";
-import type {
-  ColorPalette,
-  ColorItem,
-  ColorPaletteRequest,
-  ApiResponse,
-} from "@/types";
+import type { ColorPalette, ApiResponse } from "@/types";
 
 /**
  * 색상 팔레트 저장

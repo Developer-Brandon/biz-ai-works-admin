@@ -12,7 +12,7 @@ export interface SidebarMenu {
 }
 
 export interface TabItem {
-  key: "agentCard" | "qaCard";
+  key: "agentCard" | "questionCard";
   label: string;
   content?: any;
 }
@@ -32,7 +32,7 @@ export interface FormError {
 
 export type PageMode = "view" | "edit";
 
-export interface OperationResult<T = any> {
+export interface OperationResponse<T = any> {
   success: boolean;
   message: string;
   data?: T;
